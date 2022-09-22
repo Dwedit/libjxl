@@ -1,0 +1,640 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{50e2c39d-6457-41eb-9fd9-1733cd2fcd8b}</ProjectGuid>
+    <RootNamespace>jpegxl</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)$(ProjectName)\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)$(ProjectName)\obj\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)$(ProjectName)\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)$(ProjectName)\obj\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)$(ProjectName)\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)$(ProjectName)\obj\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)$(ProjectName)\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)$(ProjectName)\obj\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>JPEGXL_MAJOR_VERSION=0;JPEGXL_MINOR_VERSION=3;JPEGXL_PATCH_VERSION=7;_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(ProjectDir)..;$(ProjectDir)..\lib;$(ProjectDir)..\third_party\highway;$(ProjectDir)..\third_party\googletest\googletest\include;$(ProjectDir)..\lib\include;$(ProjectDir);$(ProjectDir)..\third_party\googletest\googlemock\include;$(ProjectDir)..\third_party\brotli\c\include;$(ProjectDir)..\third_party\lcms\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4146</DisableSpecificWarnings>
+      <ObjectFileName>$(IntDir)subdirectory\%(RelativeDir)</ObjectFileName>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>JPEGXL_MAJOR_VERSION=0;JPEGXL_MINOR_VERSION=3;JPEGXL_PATCH_VERSION=7;_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(ProjectDir)..;$(ProjectDir)..\lib;$(ProjectDir)..\third_party\highway;$(ProjectDir)..\third_party\googletest\googletest\include;$(ProjectDir)..\lib\include;$(ProjectDir);$(ProjectDir)..\third_party\googletest\googlemock\include;$(ProjectDir)..\third_party\brotli\c\include;$(ProjectDir)..\third_party\lcms\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4146</DisableSpecificWarnings>
+      <ObjectFileName>$(IntDir)subdirectory\%(RelativeDir)</ObjectFileName>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>JPEGXL_MAJOR_VERSION=0;JPEGXL_MINOR_VERSION=3;JPEGXL_PATCH_VERSION=7;_CRT_SECURE_NO_WARNINGS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(ProjectDir)..;$(ProjectDir)..\lib;$(ProjectDir)..\third_party\highway;$(ProjectDir)..\third_party\googletest\googletest\include;$(ProjectDir)..\lib\include;$(ProjectDir);$(ProjectDir)..\third_party\googletest\googlemock\include;$(ProjectDir)..\third_party\brotli\c\include;$(ProjectDir)..\third_party\lcms\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4146</DisableSpecificWarnings>
+      <ObjectFileName>$(IntDir)subdirectory\%(RelativeDir)</ObjectFileName>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>JPEGXL_MAJOR_VERSION=0;JPEGXL_MINOR_VERSION=3;JPEGXL_PATCH_VERSION=7;_CRT_SECURE_NO_WARNINGS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(ProjectDir)..;$(ProjectDir)..\lib;$(ProjectDir)..\third_party\highway;$(ProjectDir)..\third_party\googletest\googletest\include;$(ProjectDir)..\lib\include;$(ProjectDir);$(ProjectDir)..\third_party\googletest\googlemock\include;$(ProjectDir)..\third_party\brotli\c\include;$(ProjectDir)..\third_party\lcms\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4146</DisableSpecificWarnings>
+      <ObjectFileName>$(IntDir)subdirectory\%(RelativeDir)</ObjectFileName>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\lib\jxl\ac_context.h" />
+    <ClInclude Include="..\lib\jxl\ac_strategy.h" />
+    <ClInclude Include="..\lib\jxl\alpha.h" />
+    <ClInclude Include="..\lib\jxl\ans_common.h" />
+    <ClInclude Include="..\lib\jxl\ans_params.h" />
+    <ClInclude Include="..\lib\jxl\aux_out.h" />
+    <ClInclude Include="..\lib\jxl\aux_out_fwd.h" />
+    <ClInclude Include="..\lib\jxl\base\arch_macros.h" />
+    <ClInclude Include="..\lib\jxl\base\bits.h" />
+    <ClInclude Include="..\lib\jxl\base\byte_order.h" />
+    <ClInclude Include="..\lib\jxl\base\cache_aligned.h" />
+    <ClInclude Include="..\lib\jxl\base\compiler_specific.h" />
+    <ClInclude Include="..\lib\jxl\base\data_parallel.h" />
+    <ClInclude Include="..\lib\jxl\base\file_io.h" />
+    <ClInclude Include="..\lib\jxl\base\iaca.h" />
+    <ClInclude Include="..\lib\jxl\base\os_macros.h" />
+    <ClInclude Include="..\lib\jxl\base\override.h" />
+    <ClInclude Include="..\lib\jxl\base\padded_bytes.h" />
+    <ClInclude Include="..\lib\jxl\base\printf_macros.h" />
+    <ClInclude Include="..\lib\jxl\base\profiler.h" />
+    <ClInclude Include="..\lib\jxl\base\random.h" />
+    <ClInclude Include="..\lib\jxl\base\sanitizer_definitions.h" />
+    <ClInclude Include="..\lib\jxl\base\scope_guard.h" />
+    <ClInclude Include="..\lib\jxl\base\span.h" />
+    <ClInclude Include="..\lib\jxl\base\status.h" />
+    <ClInclude Include="..\lib\jxl\base\thread_pool_internal.h" />
+    <ClInclude Include="..\lib\jxl\blending.h" />
+    <ClInclude Include="..\lib\jxl\box_content_decoder.h" />
+    <ClInclude Include="..\lib\jxl\butteraugli\butteraugli.h" />
+    <ClInclude Include="..\lib\jxl\chroma_from_luma.h" />
+    <ClInclude Include="..\lib\jxl\codec_in_out.h" />
+    <ClInclude Include="..\lib\jxl\coeff_order.h" />
+    <ClInclude Include="..\lib\jxl\coeff_order_fwd.h" />
+    <ClInclude Include="..\lib\jxl\color_encoding_internal.h" />
+    <ClInclude Include="..\lib\jxl\color_management.h" />
+    <ClInclude Include="..\lib\jxl\common.h" />
+    <ClInclude Include="..\lib\jxl\compressed_dc.h" />
+    <ClInclude Include="..\lib\jxl\convolve-inl.h" />
+    <ClInclude Include="..\lib\jxl\convolve.h" />
+    <ClInclude Include="..\lib\jxl\dct-inl.h" />
+    <ClInclude Include="..\lib\jxl\dct_block-inl.h" />
+    <ClInclude Include="..\lib\jxl\dct_scales.h" />
+    <ClInclude Include="..\lib\jxl\dct_util.h" />
+    <ClInclude Include="..\lib\jxl\decode_to_jpeg.h" />
+    <ClInclude Include="..\lib\jxl\dec_ans.h" />
+    <ClInclude Include="..\lib\jxl\dec_bit_reader.h" />
+    <ClInclude Include="..\lib\jxl\dec_cache.h" />
+    <ClInclude Include="..\lib\jxl\dec_context_map.h" />
+    <ClInclude Include="..\lib\jxl\dec_external_image.h" />
+    <ClInclude Include="..\lib\jxl\dec_frame.h" />
+    <ClInclude Include="..\lib\jxl\dec_group.h" />
+    <ClInclude Include="..\lib\jxl\dec_group_border.h" />
+    <ClInclude Include="..\lib\jxl\dec_huffman.h" />
+    <ClInclude Include="..\lib\jxl\dec_modular.h" />
+    <ClInclude Include="..\lib\jxl\dec_noise.h" />
+    <ClInclude Include="..\lib\jxl\dec_params.h" />
+    <ClInclude Include="..\lib\jxl\dec_patch_dictionary.h" />
+    <ClInclude Include="..\lib\jxl\dec_tone_mapping-inl.h" />
+    <ClInclude Include="..\lib\jxl\dec_transforms-inl.h" />
+    <ClInclude Include="..\lib\jxl\dec_xyb-inl.h" />
+    <ClInclude Include="..\lib\jxl\dec_xyb.h" />
+    <ClInclude Include="..\lib\jxl\encode_internal.h" />
+    <ClInclude Include="..\lib\jxl\enc_ac_strategy.h" />
+    <ClInclude Include="..\lib\jxl\enc_adaptive_quantization.h" />
+    <ClInclude Include="..\lib\jxl\enc_ans.h" />
+    <ClInclude Include="..\lib\jxl\enc_ans_params.h" />
+    <ClInclude Include="..\lib\jxl\enc_ar_control_field.h" />
+    <ClInclude Include="..\lib\jxl\enc_bit_writer.h" />
+    <ClInclude Include="..\lib\jxl\enc_butteraugli_comparator.h" />
+    <ClInclude Include="..\lib\jxl\enc_butteraugli_pnorm.h" />
+    <ClInclude Include="..\lib\jxl\enc_cache.h" />
+    <ClInclude Include="..\lib\jxl\enc_chroma_from_luma.h" />
+    <ClInclude Include="..\lib\jxl\enc_cluster.h" />
+    <ClInclude Include="..\lib\jxl\enc_coeff_order.h" />
+    <ClInclude Include="..\lib\jxl\enc_color_management.h" />
+    <ClInclude Include="..\lib\jxl\enc_comparator.h" />
+    <ClInclude Include="..\lib\jxl\enc_context_map.h" />
+    <ClInclude Include="..\lib\jxl\enc_detect_dots.h" />
+    <ClInclude Include="..\lib\jxl\enc_dot_dictionary.h" />
+    <ClInclude Include="..\lib\jxl\enc_entropy_coder.h" />
+    <ClInclude Include="..\lib\jxl\enc_external_image.h" />
+    <ClInclude Include="..\lib\jxl\enc_file.h" />
+    <ClInclude Include="..\lib\jxl\enc_frame.h" />
+    <ClInclude Include="..\lib\jxl\enc_gamma_correct.h" />
+    <ClInclude Include="..\lib\jxl\enc_group.h" />
+    <ClInclude Include="..\lib\jxl\enc_heuristics.h" />
+    <ClInclude Include="..\lib\jxl\enc_huffman.h" />
+    <ClInclude Include="..\lib\jxl\enc_icc_codec.h" />
+    <ClInclude Include="..\lib\jxl\enc_image_bundle.h" />
+    <ClInclude Include="..\lib\jxl\enc_jxl_skcms.h" />
+    <ClInclude Include="..\lib\jxl\enc_modular.h" />
+    <ClInclude Include="..\lib\jxl\enc_noise.h" />
+    <ClInclude Include="..\lib\jxl\enc_params.h" />
+    <ClInclude Include="..\lib\jxl\enc_patch_dictionary.h" />
+    <ClInclude Include="..\lib\jxl\enc_photon_noise.h" />
+    <ClInclude Include="..\lib\jxl\enc_quant_weights.h" />
+    <ClInclude Include="..\lib\jxl\enc_splines.h" />
+    <ClInclude Include="..\lib\jxl\enc_toc.h" />
+    <ClInclude Include="..\lib\jxl\enc_transforms-inl.h" />
+    <ClInclude Include="..\lib\jxl\enc_transforms.h" />
+    <ClInclude Include="..\lib\jxl\enc_xyb.h" />
+    <ClInclude Include="..\lib\jxl\entropy_coder.h" />
+    <ClInclude Include="..\lib\jxl\epf.h" />
+    <ClInclude Include="..\lib\jxl\exif.h" />
+    <ClInclude Include="..\lib\jxl\fast_dct-inl.h" />
+    <ClInclude Include="..\lib\jxl\fast_dct.h" />
+    <ClInclude Include="..\lib\jxl\fast_dct128-inl.h" />
+    <ClInclude Include="..\lib\jxl\fast_dct16-inl.h" />
+    <ClInclude Include="..\lib\jxl\fast_dct256-inl.h" />
+    <ClInclude Include="..\lib\jxl\fast_dct32-inl.h" />
+    <ClInclude Include="..\lib\jxl\fast_dct64-inl.h" />
+    <ClInclude Include="..\lib\jxl\fast_dct8-inl.h" />
+    <ClInclude Include="..\lib\jxl\fast_math-inl.h" />
+    <ClInclude Include="..\lib\jxl\fields.h" />
+    <ClInclude Include="..\lib\jxl\field_encodings.h" />
+    <ClInclude Include="..\lib\jxl\frame_header.h" />
+    <ClInclude Include="..\lib\jxl\gaborish.h" />
+    <ClInclude Include="..\lib\jxl\gauss_blur.h" />
+    <ClInclude Include="..\lib\jxl\headers.h" />
+    <ClInclude Include="..\lib\jxl\huffman_table.h" />
+    <ClInclude Include="..\lib\jxl\huffman_tree.h" />
+    <ClInclude Include="..\lib\jxl\icc_codec.h" />
+    <ClInclude Include="..\lib\jxl\icc_codec_common.h" />
+    <ClInclude Include="..\lib\jxl\image.h" />
+    <ClInclude Include="..\lib\jxl\image_bundle.h" />
+    <ClInclude Include="..\lib\jxl\image_metadata.h" />
+    <ClInclude Include="..\lib\jxl\image_ops.h" />
+    <ClInclude Include="..\lib\jxl\jpeg\dec_jpeg_data.h" />
+    <ClInclude Include="..\lib\jxl\jpeg\dec_jpeg_data_writer.h" />
+    <ClInclude Include="..\lib\jxl\jpeg\dec_jpeg_output_chunk.h" />
+    <ClInclude Include="..\lib\jxl\jpeg\dec_jpeg_serialization_state.h" />
+    <ClInclude Include="..\lib\jxl\jpeg\enc_jpeg_data.h" />
+    <ClInclude Include="..\lib\jxl\jpeg\enc_jpeg_data_reader.h" />
+    <ClInclude Include="..\lib\jxl\jpeg\enc_jpeg_huffman_decode.h" />
+    <ClInclude Include="..\lib\jxl\jpeg\jpeg_data.h" />
+    <ClInclude Include="..\lib\jxl\jxl_inspection.h" />
+    <ClInclude Include="..\lib\jxl\lehmer_code.h" />
+    <ClInclude Include="..\lib\jxl\linalg.h" />
+    <ClInclude Include="..\lib\jxl\loop_filter.h" />
+    <ClInclude Include="..\lib\jxl\luminance.h" />
+    <ClInclude Include="..\lib\jxl\memory_manager_internal.h" />
+    <ClInclude Include="..\lib\jxl\modular\encoding\context_predict.h" />
+    <ClInclude Include="..\lib\jxl\modular\encoding\dec_ma.h" />
+    <ClInclude Include="..\lib\jxl\modular\encoding\encoding.h" />
+    <ClInclude Include="..\lib\jxl\modular\encoding\enc_debug_tree.h" />
+    <ClInclude Include="..\lib\jxl\modular\encoding\enc_encoding.h" />
+    <ClInclude Include="..\lib\jxl\modular\encoding\enc_ma.h" />
+    <ClInclude Include="..\lib\jxl\modular\encoding\ma_common.h" />
+    <ClInclude Include="..\lib\jxl\modular\modular_image.h" />
+    <ClInclude Include="..\lib\jxl\modular\options.h" />
+    <ClInclude Include="..\lib\jxl\modular\transform\enc_palette.h" />
+    <ClInclude Include="..\lib\jxl\modular\transform\enc_rct.h" />
+    <ClInclude Include="..\lib\jxl\modular\transform\enc_squeeze.h" />
+    <ClInclude Include="..\lib\jxl\modular\transform\enc_transform.h" />
+    <ClInclude Include="..\lib\jxl\modular\transform\palette.h" />
+    <ClInclude Include="..\lib\jxl\modular\transform\rct.h" />
+    <ClInclude Include="..\lib\jxl\modular\transform\squeeze.h" />
+    <ClInclude Include="..\lib\jxl\modular\transform\transform.h" />
+    <ClInclude Include="..\lib\jxl\noise.h" />
+    <ClInclude Include="..\lib\jxl\opsin_params.h" />
+    <ClInclude Include="..\lib\jxl\optimize.h" />
+    <ClInclude Include="..\lib\jxl\passes_state.h" />
+    <ClInclude Include="..\lib\jxl\patch_dictionary_internal.h" />
+    <ClInclude Include="..\lib\jxl\progressive_split.h" />
+    <ClInclude Include="..\lib\jxl\quantizer-inl.h" />
+    <ClInclude Include="..\lib\jxl\quantizer.h" />
+    <ClInclude Include="..\lib\jxl\quant_weights.h" />
+    <ClInclude Include="..\lib\jxl\rational_polynomial-inl.h" />
+    <ClInclude Include="..\lib\jxl\render_pipeline\low_memory_render_pipeline.h" />
+    <ClInclude Include="..\lib\jxl\render_pipeline\render_pipeline.h" />
+    <ClInclude Include="..\lib\jxl\render_pipeline\render_pipeline_stage.h" />
+    <ClInclude Include="..\lib\jxl\render_pipeline\simple_render_pipeline.h" />
+    <ClInclude Include="..\lib\jxl\render_pipeline\stage_blending.h" />
+    <ClInclude Include="..\lib\jxl\render_pipeline\stage_chroma_upsampling.h" />
+    <ClInclude Include="..\lib\jxl\render_pipeline\stage_epf.h" />
+    <ClInclude Include="..\lib\jxl\render_pipeline\stage_from_linear.h" />
+    <ClInclude Include="..\lib\jxl\render_pipeline\stage_gaborish.h" />
+    <ClInclude Include="..\lib\jxl\render_pipeline\stage_noise.h" />
+    <ClInclude Include="..\lib\jxl\render_pipeline\stage_patches.h" />
+    <ClInclude Include="..\lib\jxl\render_pipeline\stage_splines.h" />
+    <ClInclude Include="..\lib\jxl\render_pipeline\stage_spot.h" />
+    <ClInclude Include="..\lib\jxl\render_pipeline\stage_tone_mapping.h" />
+    <ClInclude Include="..\lib\jxl\render_pipeline\stage_to_linear.h" />
+    <ClInclude Include="..\lib\jxl\render_pipeline\stage_upsampling.h" />
+    <ClInclude Include="..\lib\jxl\render_pipeline\stage_write.h" />
+    <ClInclude Include="..\lib\jxl\render_pipeline\stage_xyb.h" />
+    <ClInclude Include="..\lib\jxl\render_pipeline\stage_ycbcr.h" />
+    <ClInclude Include="..\lib\jxl\sanitizers.h" />
+    <ClInclude Include="..\lib\jxl\simd_util-inl.h" />
+    <ClInclude Include="..\lib\jxl\size_constraints.h" />
+    <ClInclude Include="..\lib\jxl\splines.h" />
+    <ClInclude Include="..\lib\jxl\toc.h" />
+    <ClInclude Include="..\lib\jxl\transfer_functions-inl.h" />
+    <ClInclude Include="..\lib\jxl\transpose-inl.h" />
+    <ClInclude Include="..\lib\jxl\xorshift128plus-inl.h" />
+    <ClInclude Include="..\lib\threads\thread_parallel_runner_internal.h" />
+    <ClInclude Include="..\third_party\brotli\c\common\constants.h" />
+    <ClInclude Include="..\third_party\brotli\c\common\context.h" />
+    <ClInclude Include="..\third_party\brotli\c\common\dictionary.h" />
+    <ClInclude Include="..\third_party\brotli\c\common\platform.h" />
+    <ClInclude Include="..\third_party\brotli\c\common\transform.h" />
+    <ClInclude Include="..\third_party\brotli\c\common\version.h" />
+    <ClInclude Include="..\third_party\brotli\c\dec\bit_reader.h" />
+    <ClInclude Include="..\third_party\brotli\c\dec\huffman.h" />
+    <ClInclude Include="..\third_party\brotli\c\dec\prefix.h" />
+    <ClInclude Include="..\third_party\brotli\c\dec\state.h" />
+    <ClInclude Include="..\third_party\brotli\c\enc\backward_references.h" />
+    <ClInclude Include="..\third_party\brotli\c\enc\backward_references_hq.h" />
+    <ClInclude Include="..\third_party\brotli\c\enc\backward_references_inc.h" />
+    <ClInclude Include="..\third_party\brotli\c\enc\bit_cost.h" />
+    <ClInclude Include="..\third_party\brotli\c\enc\bit_cost_inc.h" />
+    <ClInclude Include="..\third_party\brotli\c\enc\block_encoder_inc.h" />
+    <ClInclude Include="..\third_party\brotli\c\enc\block_splitter.h" />
+    <ClInclude Include="..\third_party\brotli\c\enc\block_splitter_inc.h" />
+    <ClInclude Include="..\third_party\brotli\c\enc\brotli_bit_stream.h" />
+    <ClInclude Include="..\third_party\brotli\c\enc\cluster.h" />
+    <ClInclude Include="..\third_party\brotli\c\enc\cluster_inc.h" />
+    <ClInclude Include="..\third_party\brotli\c\enc\command.h" />
+    <ClInclude Include="..\third_party\brotli\c\enc\compress_fragment.h" />
+    <ClInclude Include="..\third_party\brotli\c\enc\compress_fragment_two_pass.h" />
+    <ClInclude Include="..\third_party\brotli\c\enc\dictionary_hash.h" />
+    <ClInclude Include="..\third_party\brotli\c\enc\encoder_dict.h" />
+    <ClInclude Include="..\third_party\brotli\c\enc\entropy_encode.h" />
+    <ClInclude Include="..\third_party\brotli\c\enc\entropy_encode_static.h" />
+    <ClInclude Include="..\third_party\brotli\c\enc\fast_log.h" />
+    <ClInclude Include="..\third_party\brotli\c\enc\find_match_length.h" />
+    <ClInclude Include="..\third_party\brotli\c\enc\hash.h" />
+    <ClInclude Include="..\third_party\brotli\c\enc\hash_composite_inc.h" />
+    <ClInclude Include="..\third_party\brotli\c\enc\hash_forgetful_chain_inc.h" />
+    <ClInclude Include="..\third_party\brotli\c\enc\hash_longest_match64_inc.h" />
+    <ClInclude Include="..\third_party\brotli\c\enc\hash_longest_match_inc.h" />
+    <ClInclude Include="..\third_party\brotli\c\enc\hash_longest_match_quickly_inc.h" />
+    <ClInclude Include="..\third_party\brotli\c\enc\hash_rolling_inc.h" />
+    <ClInclude Include="..\third_party\brotli\c\enc\hash_to_binary_tree_inc.h" />
+    <ClInclude Include="..\third_party\brotli\c\enc\histogram.h" />
+    <ClInclude Include="..\third_party\brotli\c\enc\histogram_inc.h" />
+    <ClInclude Include="..\third_party\brotli\c\enc\literal_cost.h" />
+    <ClInclude Include="..\third_party\brotli\c\enc\memory.h" />
+    <ClInclude Include="..\third_party\brotli\c\enc\metablock.h" />
+    <ClInclude Include="..\third_party\brotli\c\enc\metablock_inc.h" />
+    <ClInclude Include="..\third_party\brotli\c\enc\params.h" />
+    <ClInclude Include="..\third_party\brotli\c\enc\prefix.h" />
+    <ClInclude Include="..\third_party\brotli\c\enc\quality.h" />
+    <ClInclude Include="..\third_party\brotli\c\enc\ringbuffer.h" />
+    <ClInclude Include="..\third_party\brotli\c\enc\static_dict.h" />
+    <ClInclude Include="..\third_party\brotli\c\enc\static_dict_lut.h" />
+    <ClInclude Include="..\third_party\brotli\c\enc\utf8_util.h" />
+    <ClInclude Include="..\third_party\brotli\c\enc\write_bits.h" />
+    <ClInclude Include="..\third_party\highway\hwy\aligned_allocator.h" />
+    <ClInclude Include="..\third_party\highway\hwy\base.h" />
+    <ClInclude Include="..\third_party\highway\hwy\cache_control.h" />
+    <ClInclude Include="..\third_party\highway\hwy\foreach_target.h" />
+    <ClInclude Include="..\third_party\highway\hwy\highway.h" />
+    <ClInclude Include="..\third_party\highway\hwy\ops\arm_neon-inl.h" />
+    <ClInclude Include="..\third_party\highway\hwy\ops\arm_sve-inl.h" />
+    <ClInclude Include="..\third_party\highway\hwy\ops\rvv-inl.h" />
+    <ClInclude Include="..\third_party\highway\hwy\ops\scalar-inl.h" />
+    <ClInclude Include="..\third_party\highway\hwy\ops\set_macros-inl.h" />
+    <ClInclude Include="..\third_party\highway\hwy\ops\shared-inl.h" />
+    <ClInclude Include="..\third_party\highway\hwy\ops\wasm_128-inl.h" />
+    <ClInclude Include="..\third_party\highway\hwy\ops\x86_128-inl.h" />
+    <ClInclude Include="..\third_party\highway\hwy\ops\x86_256-inl.h" />
+    <ClInclude Include="..\third_party\highway\hwy\ops\x86_512-inl.h" />
+    <ClInclude Include="..\third_party\highway\hwy\targets.h" />
+    <ClInclude Include="..\third_party\lcms\src\lcms2_internal.h" />
+    <ClInclude Include="jxl\jxl_export.h" />
+    <ClInclude Include="jxl\jxl_threads_export.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\lib\jxl\ac_strategy.cc" />
+    <ClCompile Include="..\lib\jxl\alpha.cc" />
+    <ClCompile Include="..\lib\jxl\ans_common.cc" />
+    <ClCompile Include="..\lib\jxl\aux_out.cc" />
+    <ClCompile Include="..\lib\jxl\base\cache_aligned.cc" />
+    <ClCompile Include="..\lib\jxl\base\data_parallel.cc" />
+    <ClCompile Include="..\lib\jxl\base\padded_bytes.cc" />
+    <ClCompile Include="..\lib\jxl\base\random.cc" />
+    <ClCompile Include="..\lib\jxl\blending.cc" />
+    <ClCompile Include="..\lib\jxl\box_content_decoder.cc" />
+    <ClCompile Include="..\lib\jxl\butteraugli\butteraugli.cc" />
+    <ClCompile Include="..\lib\jxl\butteraugli_wrapper.cc" />
+    <ClCompile Include="..\lib\jxl\chroma_from_luma.cc" />
+    <ClCompile Include="..\lib\jxl\coeff_order.cc" />
+    <ClCompile Include="..\lib\jxl\color_encoding_internal.cc" />
+    <ClCompile Include="..\lib\jxl\color_management.cc" />
+    <ClCompile Include="..\lib\jxl\compressed_dc.cc" />
+    <ClCompile Include="..\lib\jxl\convolve_separable5.cc" />
+    <ClCompile Include="..\lib\jxl\convolve_separable7.cc" />
+    <ClCompile Include="..\lib\jxl\convolve_slow.cc" />
+    <ClCompile Include="..\lib\jxl\convolve_symmetric3.cc" />
+    <ClCompile Include="..\lib\jxl\convolve_symmetric5.cc" />
+    <ClCompile Include="..\lib\jxl\dct_scales.cc" />
+    <ClCompile Include="..\lib\jxl\decode.cc" />
+    <ClCompile Include="..\lib\jxl\decode_to_jpeg.cc" />
+    <ClCompile Include="..\lib\jxl\dec_ans.cc" />
+    <ClCompile Include="..\lib\jxl\dec_cache.cc" />
+    <ClCompile Include="..\lib\jxl\dec_context_map.cc" />
+    <ClCompile Include="..\lib\jxl\dec_external_image.cc" />
+    <ClCompile Include="..\lib\jxl\dec_frame.cc" />
+    <ClCompile Include="..\lib\jxl\dec_group.cc" />
+    <ClCompile Include="..\lib\jxl\dec_group_border.cc" />
+    <ClCompile Include="..\lib\jxl\dec_huffman.cc" />
+    <ClCompile Include="..\lib\jxl\dec_modular.cc" />
+    <ClCompile Include="..\lib\jxl\dec_noise.cc" />
+    <ClCompile Include="..\lib\jxl\dec_patch_dictionary.cc" />
+    <ClCompile Include="..\lib\jxl\dec_xyb.cc" />
+    <ClCompile Include="..\lib\jxl\encode.cc" />
+    <ClCompile Include="..\lib\jxl\enc_ac_strategy.cc" />
+    <ClCompile Include="..\lib\jxl\enc_adaptive_quantization.cc" />
+    <ClCompile Include="..\lib\jxl\enc_ans.cc" />
+    <ClCompile Include="..\lib\jxl\enc_ar_control_field.cc" />
+    <ClCompile Include="..\lib\jxl\enc_bit_writer.cc" />
+    <ClCompile Include="..\lib\jxl\enc_butteraugli_comparator.cc" />
+    <ClCompile Include="..\lib\jxl\enc_butteraugli_pnorm.cc" />
+    <ClCompile Include="..\lib\jxl\enc_cache.cc" />
+    <ClCompile Include="..\lib\jxl\enc_chroma_from_luma.cc" />
+    <ClCompile Include="..\lib\jxl\enc_cluster.cc" />
+    <ClCompile Include="..\lib\jxl\enc_coeff_order.cc" />
+    <ClCompile Include="..\lib\jxl\enc_color_management.cc" />
+    <ClCompile Include="..\lib\jxl\enc_comparator.cc" />
+    <ClCompile Include="..\lib\jxl\enc_context_map.cc" />
+    <ClCompile Include="..\lib\jxl\enc_detect_dots.cc" />
+    <ClCompile Include="..\lib\jxl\enc_dot_dictionary.cc" />
+    <ClCompile Include="..\lib\jxl\enc_entropy_coder.cc" />
+    <ClCompile Include="..\lib\jxl\enc_external_image.cc" />
+    <ClCompile Include="..\lib\jxl\enc_file.cc" />
+    <ClCompile Include="..\lib\jxl\enc_frame.cc" />
+    <ClCompile Include="..\lib\jxl\enc_group.cc" />
+    <ClCompile Include="..\lib\jxl\enc_heuristics.cc" />
+    <ClCompile Include="..\lib\jxl\enc_huffman.cc" />
+    <ClCompile Include="..\lib\jxl\enc_icc_codec.cc" />
+    <ClCompile Include="..\lib\jxl\enc_image_bundle.cc" />
+    <ClCompile Include="..\lib\jxl\enc_modular.cc" />
+    <ClCompile Include="..\lib\jxl\enc_noise.cc" />
+    <ClCompile Include="..\lib\jxl\enc_patch_dictionary.cc" />
+    <ClCompile Include="..\lib\jxl\enc_photon_noise.cc" />
+    <ClCompile Include="..\lib\jxl\enc_quant_weights.cc" />
+    <ClCompile Include="..\lib\jxl\enc_splines.cc" />
+    <ClCompile Include="..\lib\jxl\enc_toc.cc" />
+    <ClCompile Include="..\lib\jxl\enc_transforms.cc" />
+    <ClCompile Include="..\lib\jxl\enc_xyb.cc" />
+    <ClCompile Include="..\lib\jxl\entropy_coder.cc" />
+    <ClCompile Include="..\lib\jxl\epf.cc" />
+    <ClCompile Include="..\lib\jxl\fast_dct.cc" />
+    <ClCompile Include="..\lib\jxl\fields.cc" />
+    <ClCompile Include="..\lib\jxl\frame_header.cc" />
+    <ClCompile Include="..\lib\jxl\gaborish.cc" />
+    <ClCompile Include="..\lib\jxl\gauss_blur.cc" />
+    <ClCompile Include="..\lib\jxl\headers.cc" />
+    <ClCompile Include="..\lib\jxl\huffman_table.cc" />
+    <ClCompile Include="..\lib\jxl\huffman_tree.cc" />
+    <ClCompile Include="..\lib\jxl\icc_codec.cc" />
+    <ClCompile Include="..\lib\jxl\icc_codec_common.cc" />
+    <ClCompile Include="..\lib\jxl\image.cc" />
+    <ClCompile Include="..\lib\jxl\image_bundle.cc" />
+    <ClCompile Include="..\lib\jxl\image_metadata.cc" />
+    <ClCompile Include="..\lib\jxl\jpeg\dec_jpeg_data.cc" />
+    <ClCompile Include="..\lib\jxl\jpeg\dec_jpeg_data_writer.cc" />
+    <ClCompile Include="..\lib\jxl\jpeg\enc_jpeg_data.cc" />
+    <ClCompile Include="..\lib\jxl\jpeg\enc_jpeg_data_reader.cc" />
+    <ClCompile Include="..\lib\jxl\jpeg\enc_jpeg_huffman_decode.cc" />
+    <ClCompile Include="..\lib\jxl\jpeg\jpeg_data.cc" />
+    <ClCompile Include="..\lib\jxl\linalg.cc" />
+    <ClCompile Include="..\lib\jxl\loop_filter.cc" />
+    <ClCompile Include="..\lib\jxl\luminance.cc" />
+    <ClCompile Include="..\lib\jxl\memory_manager_internal.cc" />
+    <ClCompile Include="..\lib\jxl\modular\encoding\dec_ma.cc" />
+    <ClCompile Include="..\lib\jxl\modular\encoding\encoding.cc" />
+    <ClCompile Include="..\lib\jxl\modular\encoding\enc_debug_tree.cc" />
+    <ClCompile Include="..\lib\jxl\modular\encoding\enc_encoding.cc" />
+    <ClCompile Include="..\lib\jxl\modular\encoding\enc_ma.cc" />
+    <ClCompile Include="..\lib\jxl\modular\modular_image.cc" />
+    <ClCompile Include="..\lib\jxl\modular\transform\enc_palette.cc" />
+    <ClCompile Include="..\lib\jxl\modular\transform\enc_rct.cc" />
+    <ClCompile Include="..\lib\jxl\modular\transform\enc_squeeze.cc" />
+    <ClCompile Include="..\lib\jxl\modular\transform\enc_transform.cc" />
+    <ClCompile Include="..\lib\jxl\modular\transform\rct.cc" />
+    <ClCompile Include="..\lib\jxl\modular\transform\squeeze.cc" />
+    <ClCompile Include="..\lib\jxl\modular\transform\transform.cc" />
+    <ClCompile Include="..\lib\jxl\opsin_params.cc" />
+    <ClCompile Include="..\lib\jxl\optimize.cc" />
+    <ClCompile Include="..\lib\jxl\passes_state.cc" />
+    <ClCompile Include="..\lib\jxl\progressive_split.cc" />
+    <ClCompile Include="..\lib\jxl\quantizer.cc" />
+    <ClCompile Include="..\lib\jxl\quant_weights.cc" />
+    <ClCompile Include="..\lib\jxl\render_pipeline\low_memory_render_pipeline.cc" />
+    <ClCompile Include="..\lib\jxl\render_pipeline\render_pipeline.cc" />
+    <ClCompile Include="..\lib\jxl\render_pipeline\simple_render_pipeline.cc" />
+    <ClCompile Include="..\lib\jxl\render_pipeline\stage_blending.cc" />
+    <ClCompile Include="..\lib\jxl\render_pipeline\stage_chroma_upsampling.cc" />
+    <ClCompile Include="..\lib\jxl\render_pipeline\stage_epf.cc" />
+    <ClCompile Include="..\lib\jxl\render_pipeline\stage_from_linear.cc" />
+    <ClCompile Include="..\lib\jxl\render_pipeline\stage_gaborish.cc" />
+    <ClCompile Include="..\lib\jxl\render_pipeline\stage_noise.cc" />
+    <ClCompile Include="..\lib\jxl\render_pipeline\stage_patches.cc" />
+    <ClCompile Include="..\lib\jxl\render_pipeline\stage_splines.cc" />
+    <ClCompile Include="..\lib\jxl\render_pipeline\stage_spot.cc" />
+    <ClCompile Include="..\lib\jxl\render_pipeline\stage_tone_mapping.cc" />
+    <ClCompile Include="..\lib\jxl\render_pipeline\stage_to_linear.cc" />
+    <ClCompile Include="..\lib\jxl\render_pipeline\stage_upsampling.cc" />
+    <ClCompile Include="..\lib\jxl\render_pipeline\stage_write.cc" />
+    <ClCompile Include="..\lib\jxl\render_pipeline\stage_xyb.cc" />
+    <ClCompile Include="..\lib\jxl\render_pipeline\stage_ycbcr.cc" />
+    <ClCompile Include="..\lib\jxl\splines.cc" />
+    <ClCompile Include="..\lib\jxl\toc.cc" />
+    <ClCompile Include="..\lib\threads\resizable_parallel_runner.cc" />
+    <ClCompile Include="..\lib\threads\thread_parallel_runner.cc" />
+    <ClCompile Include="..\lib\threads\thread_parallel_runner_internal.cc" />
+    <ClCompile Include="..\third_party\brotli\c\common\dictionary.c" />
+    <ClCompile Include="..\third_party\brotli\c\common\transform.c" />
+    <ClCompile Include="..\third_party\brotli\c\dec\bit_reader.c" />
+    <ClCompile Include="..\third_party\brotli\c\dec\decode.c" />
+    <ClCompile Include="..\third_party\brotli\c\dec\huffman.c" />
+    <ClCompile Include="..\third_party\brotli\c\dec\state.c" />
+    <ClCompile Include="..\third_party\brotli\c\enc\backward_references.c" />
+    <ClCompile Include="..\third_party\brotli\c\enc\backward_references_hq.c" />
+    <ClCompile Include="..\third_party\brotli\c\enc\bit_cost.c" />
+    <ClCompile Include="..\third_party\brotli\c\enc\block_splitter.c" />
+    <ClCompile Include="..\third_party\brotli\c\enc\brotli_bit_stream.c" />
+    <ClCompile Include="..\third_party\brotli\c\enc\cluster.c" />
+    <ClCompile Include="..\third_party\brotli\c\enc\compress_fragment.c" />
+    <ClCompile Include="..\third_party\brotli\c\enc\compress_fragment_two_pass.c" />
+    <ClCompile Include="..\third_party\brotli\c\enc\dictionary_hash.c" />
+    <ClCompile Include="..\third_party\brotli\c\enc\encode.c" />
+    <ClCompile Include="..\third_party\brotli\c\enc\encoder_dict.c" />
+    <ClCompile Include="..\third_party\brotli\c\enc\entropy_encode.c" />
+    <ClCompile Include="..\third_party\brotli\c\enc\histogram.c" />
+    <ClCompile Include="..\third_party\brotli\c\enc\literal_cost.c" />
+    <ClCompile Include="..\third_party\brotli\c\enc\memory.c" />
+    <ClCompile Include="..\third_party\brotli\c\enc\metablock.c" />
+    <ClCompile Include="..\third_party\brotli\c\enc\static_dict.c" />
+    <ClCompile Include="..\third_party\brotli\c\enc\utf8_util.c" />
+    <ClCompile Include="..\third_party\highway\hwy\aligned_allocator.cc" />
+    <ClCompile Include="..\third_party\highway\hwy\per_target.cc" />
+    <ClCompile Include="..\third_party\highway\hwy\print.cc" />
+    <ClCompile Include="..\third_party\highway\hwy\targets.cc" />
+    <ClCompile Include="..\third_party\lcms\src\cmsalpha.c" />
+    <ClCompile Include="..\third_party\lcms\src\cmscam02.c" />
+    <ClCompile Include="..\third_party\lcms\src\cmscgats.c" />
+    <ClCompile Include="..\third_party\lcms\src\cmscnvrt.c" />
+    <ClCompile Include="..\third_party\lcms\src\cmserr.c" />
+    <ClCompile Include="..\third_party\lcms\src\cmsgamma.c" />
+    <ClCompile Include="..\third_party\lcms\src\cmsgmt.c" />
+    <ClCompile Include="..\third_party\lcms\src\cmshalf.c" />
+    <ClCompile Include="..\third_party\lcms\src\cmsintrp.c" />
+    <ClCompile Include="..\third_party\lcms\src\cmsio0.c" />
+    <ClCompile Include="..\third_party\lcms\src\cmsio1.c" />
+    <ClCompile Include="..\third_party\lcms\src\cmslut.c" />
+    <ClCompile Include="..\third_party\lcms\src\cmsmd5.c" />
+    <ClCompile Include="..\third_party\lcms\src\cmsmtrx.c" />
+    <ClCompile Include="..\third_party\lcms\src\cmsnamed.c" />
+    <ClCompile Include="..\third_party\lcms\src\cmsopt.c" />
+    <ClCompile Include="..\third_party\lcms\src\cmspack.c" />
+    <ClCompile Include="..\third_party\lcms\src\cmspcs.c" />
+    <ClCompile Include="..\third_party\lcms\src\cmsplugin.c" />
+    <ClCompile Include="..\third_party\lcms\src\cmsps2.c" />
+    <ClCompile Include="..\third_party\lcms\src\cmssamp.c" />
+    <ClCompile Include="..\third_party\lcms\src\cmssm.c" />
+    <ClCompile Include="..\third_party\lcms\src\cmstypes.c" />
+    <ClCompile Include="..\third_party\lcms\src\cmsvirt.c" />
+    <ClCompile Include="..\third_party\lcms\src\cmswtpnt.c" />
+    <ClCompile Include="..\third_party\lcms\src\cmsxform.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\lib\jxl\jxl.syms" />
+    <None Include="..\lib\jxl\jxl.version" />
+    <None Include="..\lib\jxl\jxl_osx.syms" />
+    <None Include="..\third_party\lcms\src\lcms2.def" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
