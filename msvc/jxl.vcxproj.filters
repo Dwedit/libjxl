@@ -783,9 +783,6 @@
     <ClInclude Include="..\lib\jxl\dec_cache.h">
       <Filter>Source Files\lib\jxl</Filter>
     </ClInclude>
-    <ClInclude Include="..\lib\jxl\dec_transforms_testonly.h">
-      <Filter>Source Files\lib\jxl</Filter>
-    </ClInclude>
     <ClInclude Include="..\lib\jxl\enc_aux_out.h">
       <Filter>Source Files\lib\jxl</Filter>
     </ClInclude>
@@ -902,6 +899,15 @@
     </ClInclude>
     <ClInclude Include="jxl\jxl_cms_export.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\jxl\cache_aligned.h">
+      <Filter>Source Files\lib\jxl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\jxl\enc_ar_control_field.h">
+      <Filter>Source Files\lib\jxl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\jxl\sanitizers.h">
+      <Filter>Source Files\lib\jxl</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1312,6 +1318,12 @@
     </ClCompile>
     <ClCompile Include="..\lib\jxl\render_pipeline\stage_cms.cc">
       <Filter>Source Files\lib\jxl\render_pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\jxl\cache_aligned.cc">
+      <Filter>Source Files\lib\jxl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\jxl\enc_ar_control_field.cc">
+      <Filter>Source Files\lib\jxl</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -209,6 +209,7 @@
     <ClInclude Include="..\lib\jxl\blending.h" />
     <ClInclude Include="..\lib\jxl\box_content_decoder.h" />
     <ClInclude Include="..\lib\jxl\butteraugli\butteraugli.h" />
+    <ClInclude Include="..\lib\jxl\cache_aligned.h" />
     <ClInclude Include="..\lib\jxl\chroma_from_luma.h" />
     <ClInclude Include="..\lib\jxl\codec_in_out.h" />
     <ClInclude Include="..\lib\jxl\coeff_order.h" />
@@ -237,7 +238,6 @@
     <ClInclude Include="..\lib\jxl\dec_noise.h" />
     <ClInclude Include="..\lib\jxl\dec_patch_dictionary.h" />
     <ClInclude Include="..\lib\jxl\dec_transforms-inl.h" />
-    <ClInclude Include="..\lib\jxl\dec_transforms_testonly.h" />
     <ClInclude Include="..\lib\jxl\dec_xyb-inl.h" />
     <ClInclude Include="..\lib\jxl\dec_xyb.h" />
     <ClInclude Include="..\lib\jxl\encode_internal.h" />
@@ -245,6 +245,7 @@
     <ClInclude Include="..\lib\jxl\enc_adaptive_quantization.h" />
     <ClInclude Include="..\lib\jxl\enc_ans.h" />
     <ClInclude Include="..\lib\jxl\enc_ans_params.h" />
+    <ClInclude Include="..\lib\jxl\enc_ar_control_field.h" />
     <ClInclude Include="..\lib\jxl\enc_aux_out.h" />
     <ClInclude Include="..\lib\jxl\enc_bit_writer.h" />
     <ClInclude Include="..\lib\jxl\enc_butteraugli_comparator.h" />
@@ -366,6 +367,7 @@
     <ClInclude Include="..\lib\jxl\render_pipeline\stage_xyb.h" />
     <ClInclude Include="..\lib\jxl\render_pipeline\stage_ycbcr.h" />
     <ClInclude Include="..\lib\jxl\render_pipeline\test_render_pipeline_stages.h" />
+    <ClInclude Include="..\lib\jxl\sanitizers.h" />
     <ClInclude Include="..\lib\jxl\simd_util-inl.h" />
     <ClInclude Include="..\lib\jxl\simd_util.h" />
     <ClInclude Include="..\lib\jxl\splines.h" />
@@ -465,6 +467,7 @@
     <ClCompile Include="..\lib\jxl\blending.cc" />
     <ClCompile Include="..\lib\jxl\box_content_decoder.cc" />
     <ClCompile Include="..\lib\jxl\butteraugli\butteraugli.cc" />
+    <ClCompile Include="..\lib\jxl\cache_aligned.cc" />
     <ClCompile Include="..\lib\jxl\chroma_from_luma.cc" />
     <ClCompile Include="..\lib\jxl\coeff_order.cc" />
     <ClCompile Include="..\lib\jxl\color_encoding_internal.cc" />
@@ -492,6 +495,7 @@
     <ClCompile Include="..\lib\jxl\enc_ac_strategy.cc" />
     <ClCompile Include="..\lib\jxl\enc_adaptive_quantization.cc" />
     <ClCompile Include="..\lib\jxl\enc_ans.cc" />
+    <ClCompile Include="..\lib\jxl\enc_ar_control_field.cc" />
     <ClCompile Include="..\lib\jxl\enc_aux_out.cc" />
     <ClCompile Include="..\lib\jxl\enc_bit_writer.cc" />
     <ClCompile Include="..\lib\jxl\enc_butteraugli_comparator.cc" />
