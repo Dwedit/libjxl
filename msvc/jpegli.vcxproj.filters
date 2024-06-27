@@ -1,0 +1,312 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{fa3ffcb2-e386-4ede-8012-6039e4a2f827}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{855a7b1d-9e5e-4817-a28c-bf100512884b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lib">
+      <UniqueIdentifier>{7cbf64e7-c58b-4ee7-af33-be7982ffe896}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lib\jpegli">
+      <UniqueIdentifier>{586fa11a-891e-4d96-b630-d81aeaa7a169}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\third_party">
+      <UniqueIdentifier>{078396d6-f1fa-4a98-9787-c3bd9582a3f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\third_party\highway">
+      <UniqueIdentifier>{5350bfe1-634a-4c4e-bbf5-41bf29b88392}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\third_party\highway\ops">
+      <UniqueIdentifier>{4727b121-4fa0-44a4-8258-67b885865ffd}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\lib\jpegli\adaptive_quantization.h">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\jpegli\bit_writer.h">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\jpegli\bitstream.h">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\jpegli\color_quantize.h">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\jpegli\color_transform.h">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\jpegli\common.h">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\jpegli\common_internal.h">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\jpegli\dct-inl.h">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\jpegli\decode.h">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\jpegli\decode_internal.h">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\jpegli\decode_marker.h">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\jpegli\decode_scan.h">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\jpegli\downsample.h">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\jpegli\encode.h">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\jpegli\encode_finish.h">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\jpegli\encode_internal.h">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\jpegli\encode_streaming.h">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\jpegli\entropy_coding.h">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\jpegli\entropy_coding-inl.h">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\jpegli\error.h">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\jpegli\huffman.h">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\jpegli\idct.h">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\jpegli\input.h">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\jpegli\memory_manager.h">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\jpegli\quant.h">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\jpegli\render.h">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\jpegli\simd.h">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\jpegli\transpose-inl.h">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\jpegli\types.h">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\jpegli\upsample.h">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\aligned_allocator.h">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\base.h">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\cache_control.h">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\detect_compiler_arch.h">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\detect_targets.h">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\foreach_target.h">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\highway.h">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\highway_export.h">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\nanobenchmark.h">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\per_target.h">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\print.h">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\print-inl.h">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\profiler.h">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\robust_statistics.h">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\targets.h">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\timer.h">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\timer-inl.h">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\ops\arm_neon-inl.h">
+      <Filter>Source Files\third_party\highway\ops</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\ops\arm_sve-inl.h">
+      <Filter>Source Files\third_party\highway\ops</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\ops\emu128-inl.h">
+      <Filter>Source Files\third_party\highway\ops</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\ops\generic_ops-inl.h">
+      <Filter>Source Files\third_party\highway\ops</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\ops\ppc_vsx-inl.h">
+      <Filter>Source Files\third_party\highway\ops</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\ops\rvv-inl.h">
+      <Filter>Source Files\third_party\highway\ops</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\ops\scalar-inl.h">
+      <Filter>Source Files\third_party\highway\ops</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\ops\set_macros-inl.h">
+      <Filter>Source Files\third_party\highway\ops</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\ops\shared-inl.h">
+      <Filter>Source Files\third_party\highway\ops</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\ops\tuple-inl.h">
+      <Filter>Source Files\third_party\highway\ops</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\ops\wasm_128-inl.h">
+      <Filter>Source Files\third_party\highway\ops</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\ops\wasm_256-inl.h">
+      <Filter>Source Files\third_party\highway\ops</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\ops\x86_128-inl.h">
+      <Filter>Source Files\third_party\highway\ops</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\ops\x86_256-inl.h">
+      <Filter>Source Files\third_party\highway\ops</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\ops\x86_512-inl.h">
+      <Filter>Source Files\third_party\highway\ops</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\lib\jpegli\adaptive_quantization.cc">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\jpegli\bit_writer.cc">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\jpegli\bitstream.cc">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\jpegli\color_quantize.cc">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\jpegli\color_transform.cc">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\jpegli\common.cc">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\jpegli\decode.cc">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\jpegli\decode_marker.cc">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\jpegli\decode_scan.cc">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\jpegli\destination_manager.cc">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\jpegli\downsample.cc">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\jpegli\encode.cc">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\jpegli\encode_finish.cc">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\jpegli\encode_streaming.cc">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\jpegli\entropy_coding.cc">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\jpegli\error.cc">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\jpegli\huffman.cc">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\jpegli\idct.cc">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\jpegli\input.cc">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\jpegli\libjpeg_wrapper.cc">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\jpegli\memory_manager.cc">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\jpegli\quant.cc">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\jpegli\render.cc">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\jpegli\simd.cc">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\jpegli\source_manager.cc">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\jpegli\upsample.cc">
+      <Filter>Source Files\lib\jpegli</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\highway\hwy\aligned_allocator.cc">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\highway\hwy\nanobenchmark.cc">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\highway\hwy\per_target.cc">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\highway\hwy\print.cc">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\highway\hwy\targets.cc">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\highway\hwy\timer.cc">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

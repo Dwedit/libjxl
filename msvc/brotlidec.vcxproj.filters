@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{956bd42f-3d5e-44b0-91d5-f4f5d5441945}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\third_party">
+      <UniqueIdentifier>{264f3e0e-ed99-416f-8a76-a33ff166b057}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\third_party\brotli">
+      <UniqueIdentifier>{04c316a8-b9a4-4386-8273-b4bfd2d96aa7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\third_party\brotli\dec">
+      <UniqueIdentifier>{8533806c-44e2-4344-83bd-33be32d04d86}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{20bb5441-a5ac-4b90-9c6c-9af5f2209983}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\third_party\brotli\common">
+      <UniqueIdentifier>{0f7e98f3-3627-40d7-8bb7-964e695b3b13}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\third_party\brotli\c\dec\bit_reader.c">
+      <Filter>Source Files\third_party\brotli\dec</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\brotli\c\dec\decode.c">
+      <Filter>Source Files\third_party\brotli\dec</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\brotli\c\dec\huffman.c">
+      <Filter>Source Files\third_party\brotli\dec</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\brotli\c\dec\state.c">
+      <Filter>Source Files\third_party\brotli\dec</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\third_party\brotli\c\common\constants.h">
+      <Filter>Source Files\third_party\brotli\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\brotli\c\common\context.h">
+      <Filter>Source Files\third_party\brotli\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\brotli\c\common\platform.h">
+      <Filter>Source Files\third_party\brotli\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\brotli\c\common\shared_dictionary_internal.h">
+      <Filter>Source Files\third_party\brotli\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\brotli\c\common\transform.h">
+      <Filter>Source Files\third_party\brotli\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\brotli\c\common\version.h">
+      <Filter>Source Files\third_party\brotli\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\brotli\c\dec\bit_reader.h">
+      <Filter>Source Files\third_party\brotli\dec</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\brotli\c\dec\huffman.h">
+      <Filter>Source Files\third_party\brotli\dec</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\brotli\c\dec\prefix.h">
+      <Filter>Source Files\third_party\brotli\dec</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\brotli\c\dec\state.h">
+      <Filter>Source Files\third_party\brotli\dec</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

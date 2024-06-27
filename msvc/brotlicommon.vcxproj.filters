@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{38c2872e-b212-4e74-965e-f33b140337a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{fdc998b0-aa92-4bdf-b42c-7aeb45aadffc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\third_party">
+      <UniqueIdentifier>{80d8747b-2e94-4618-b631-d5c213670d67}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\third_party\brotli">
+      <UniqueIdentifier>{04262c6a-a5f6-4e27-acee-e4f0c46e4971}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\third_party\brotli\common">
+      <UniqueIdentifier>{76a1ee9f-21a7-4db5-bf69-787406c9c2e7}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\third_party\brotli\c\common\constants.c">
+      <Filter>Source Files\third_party\brotli\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\brotli\c\common\context.c">
+      <Filter>Source Files\third_party\brotli\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\brotli\c\common\dictionary.c">
+      <Filter>Source Files\third_party\brotli\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\brotli\c\common\platform.c">
+      <Filter>Source Files\third_party\brotli\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\brotli\c\common\shared_dictionary.c">
+      <Filter>Source Files\third_party\brotli\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\brotli\c\common\transform.c">
+      <Filter>Source Files\third_party\brotli\common</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\third_party\brotli\c\common\constants.h">
+      <Filter>Source Files\third_party\brotli\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\brotli\c\common\context.h">
+      <Filter>Source Files\third_party\brotli\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\brotli\c\common\dictionary.h">
+      <Filter>Source Files\third_party\brotli\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\brotli\c\common\platform.h">
+      <Filter>Source Files\third_party\brotli\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\brotli\c\common\shared_dictionary_internal.h">
+      <Filter>Source Files\third_party\brotli\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\brotli\c\common\transform.h">
+      <Filter>Source Files\third_party\brotli\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\brotli\c\common\version.h">
+      <Filter>Source Files\third_party\brotli\common</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
