@@ -1,0 +1,257 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{1f01165e-aa01-4c47-b49a-6e5f1e84baf9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lib">
+      <UniqueIdentifier>{787b0464-8cea-4bf1-849f-49f30380aaff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lib\jxl">
+      <UniqueIdentifier>{90ff3efc-2dfd-4991-bcac-2393f51d559a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lib\jxl\cms">
+      <UniqueIdentifier>{0e20b87c-0457-4894-8976-5a702a634702}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\third_party">
+      <UniqueIdentifier>{6f348ce2-b26b-4380-b463-4c8450be367f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\third_party\highway">
+      <UniqueIdentifier>{44c5e165-3076-452d-a402-1c0d56dc0b7b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\third_party\highway\ops">
+      <UniqueIdentifier>{b037d275-a3ac-4ddb-91ee-12e36f5a7be0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\third_party\lcms">
+      <UniqueIdentifier>{3c72be0d-f367-4e50-a332-b613844e2429}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\lib\jxl\cms\color_encoding_cms.h">
+      <Filter>Source Files\lib\jxl\cms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\jxl\cms\jxl_cms_internal.h">
+      <Filter>Source Files\lib\jxl\cms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\jxl\cms\opsin_params.h">
+      <Filter>Source Files\lib\jxl\cms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\jxl\cms\tone_mapping.h">
+      <Filter>Source Files\lib\jxl\cms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\jxl\cms\tone_mapping-inl.h">
+      <Filter>Source Files\lib\jxl\cms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\jxl\cms\transfer_functions.h">
+      <Filter>Source Files\lib\jxl\cms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\jxl\cms\transfer_functions-inl.h">
+      <Filter>Source Files\lib\jxl\cms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\aligned_allocator.h">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\base.h">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\cache_control.h">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\detect_compiler_arch.h">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\detect_targets.h">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\foreach_target.h">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\highway.h">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\highway_export.h">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\nanobenchmark.h">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\per_target.h">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\print.h">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\print-inl.h">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\profiler.h">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\robust_statistics.h">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\targets.h">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\timer.h">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\timer-inl.h">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\ops\arm_neon-inl.h">
+      <Filter>Source Files\third_party\highway\ops</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\ops\arm_sve-inl.h">
+      <Filter>Source Files\third_party\highway\ops</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\ops\emu128-inl.h">
+      <Filter>Source Files\third_party\highway\ops</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\ops\generic_ops-inl.h">
+      <Filter>Source Files\third_party\highway\ops</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\ops\ppc_vsx-inl.h">
+      <Filter>Source Files\third_party\highway\ops</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\ops\rvv-inl.h">
+      <Filter>Source Files\third_party\highway\ops</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\ops\scalar-inl.h">
+      <Filter>Source Files\third_party\highway\ops</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\ops\set_macros-inl.h">
+      <Filter>Source Files\third_party\highway\ops</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\ops\shared-inl.h">
+      <Filter>Source Files\third_party\highway\ops</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\ops\tuple-inl.h">
+      <Filter>Source Files\third_party\highway\ops</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\ops\wasm_128-inl.h">
+      <Filter>Source Files\third_party\highway\ops</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\ops\wasm_256-inl.h">
+      <Filter>Source Files\third_party\highway\ops</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\ops\x86_128-inl.h">
+      <Filter>Source Files\third_party\highway\ops</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\ops\x86_256-inl.h">
+      <Filter>Source Files\third_party\highway\ops</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\ops\x86_512-inl.h">
+      <Filter>Source Files\third_party\highway\ops</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\lcms\src\lcms2_internal.h">
+      <Filter>Source Files\third_party\lcms</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\lib\jxl\cms\jxl_cms.cc">
+      <Filter>Source Files\lib\jxl\cms</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\highway\hwy\aligned_allocator.cc">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\highway\hwy\nanobenchmark.cc">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\highway\hwy\per_target.cc">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\highway\hwy\print.cc">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\highway\hwy\targets.cc">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\highway\hwy\timer.cc">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\lcms\src\cmsalpha.c">
+      <Filter>Source Files\third_party\lcms</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\lcms\src\cmscam02.c">
+      <Filter>Source Files\third_party\lcms</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\lcms\src\cmscgats.c">
+      <Filter>Source Files\third_party\lcms</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\lcms\src\cmscnvrt.c">
+      <Filter>Source Files\third_party\lcms</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\lcms\src\cmserr.c">
+      <Filter>Source Files\third_party\lcms</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\lcms\src\cmsgamma.c">
+      <Filter>Source Files\third_party\lcms</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\lcms\src\cmsgmt.c">
+      <Filter>Source Files\third_party\lcms</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\lcms\src\cmshalf.c">
+      <Filter>Source Files\third_party\lcms</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\lcms\src\cmsintrp.c">
+      <Filter>Source Files\third_party\lcms</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\lcms\src\cmsio0.c">
+      <Filter>Source Files\third_party\lcms</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\lcms\src\cmsio1.c">
+      <Filter>Source Files\third_party\lcms</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\lcms\src\cmslut.c">
+      <Filter>Source Files\third_party\lcms</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\lcms\src\cmsmd5.c">
+      <Filter>Source Files\third_party\lcms</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\lcms\src\cmsmtrx.c">
+      <Filter>Source Files\third_party\lcms</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\lcms\src\cmsnamed.c">
+      <Filter>Source Files\third_party\lcms</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\lcms\src\cmsopt.c">
+      <Filter>Source Files\third_party\lcms</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\lcms\src\cmspack.c">
+      <Filter>Source Files\third_party\lcms</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\lcms\src\cmspcs.c">
+      <Filter>Source Files\third_party\lcms</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\lcms\src\cmsplugin.c">
+      <Filter>Source Files\third_party\lcms</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\lcms\src\cmsps2.c">
+      <Filter>Source Files\third_party\lcms</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\lcms\src\cmssamp.c">
+      <Filter>Source Files\third_party\lcms</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\lcms\src\cmssm.c">
+      <Filter>Source Files\third_party\lcms</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\lcms\src\cmstypes.c">
+      <Filter>Source Files\third_party\lcms</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\lcms\src\cmsvirt.c">
+      <Filter>Source Files\third_party\lcms</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\lcms\src\cmswtpnt.c">
+      <Filter>Source Files\third_party\lcms</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\lcms\src\cmsxform.c">
+      <Filter>Source Files\third_party\lcms</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\third_party\lcms\src\lcms2.def">
+      <Filter>Source Files\third_party\lcms</Filter>
+    </None>
+  </ItemGroup>
+</Project>

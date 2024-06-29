@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\lib\jxl\cms\color_encoding_cms.h" />
+    <ClInclude Include="..\lib\jxl\cms\jxl_cms_internal.h" />
+    <ClInclude Include="..\lib\jxl\cms\opsin_params.h" />
+    <ClInclude Include="..\lib\jxl\cms\tone_mapping-inl.h" />
+    <ClInclude Include="..\lib\jxl\cms\tone_mapping.h" />
+    <ClInclude Include="..\lib\jxl\cms\transfer_functions-inl.h" />
+    <ClInclude Include="..\lib\jxl\cms\transfer_functions.h" />
+    <ClInclude Include="..\third_party\highway\hwy\aligned_allocator.h" />
+    <ClInclude Include="..\third_party\highway\hwy\base.h" />
+    <ClInclude Include="..\third_party\highway\hwy\cache_control.h" />
+    <ClInclude Include="..\third_party\highway\hwy\detect_compiler_arch.h" />
+    <ClInclude Include="..\third_party\highway\hwy\detect_targets.h" />
+    <ClInclude Include="..\third_party\highway\hwy\foreach_target.h" />
+    <ClInclude Include="..\third_party\highway\hwy\highway.h" />
+    <ClInclude Include="..\third_party\highway\hwy\highway_export.h" />
+    <ClInclude Include="..\third_party\highway\hwy\nanobenchmark.h" />
+    <ClInclude Include="..\third_party\highway\hwy\ops\arm_neon-inl.h" />
+    <ClInclude Include="..\third_party\highway\hwy\ops\arm_sve-inl.h" />
+    <ClInclude Include="..\third_party\highway\hwy\ops\emu128-inl.h" />
+    <ClInclude Include="..\third_party\highway\hwy\ops\generic_ops-inl.h" />
+    <ClInclude Include="..\third_party\highway\hwy\ops\ppc_vsx-inl.h" />
+    <ClInclude Include="..\third_party\highway\hwy\ops\rvv-inl.h" />
+    <ClInclude Include="..\third_party\highway\hwy\ops\scalar-inl.h" />
+    <ClInclude Include="..\third_party\highway\hwy\ops\set_macros-inl.h" />
+    <ClInclude Include="..\third_party\highway\hwy\ops\shared-inl.h" />
+    <ClInclude Include="..\third_party\highway\hwy\ops\tuple-inl.h" />
+    <ClInclude Include="..\third_party\highway\hwy\ops\wasm_128-inl.h" />
+    <ClInclude Include="..\third_party\highway\hwy\ops\wasm_256-inl.h" />
+    <ClInclude Include="..\third_party\highway\hwy\ops\x86_128-inl.h" />
+    <ClInclude Include="..\third_party\highway\hwy\ops\x86_256-inl.h" />
+    <ClInclude Include="..\third_party\highway\hwy\ops\x86_512-inl.h" />
+    <ClInclude Include="..\third_party\highway\hwy\per_target.h" />
+    <ClInclude Include="..\third_party\highway\hwy\print-inl.h" />
+    <ClInclude Include="..\third_party\highway\hwy\print.h" />
+    <ClInclude Include="..\third_party\highway\hwy\profiler.h" />
+    <ClInclude Include="..\third_party\highway\hwy\robust_statistics.h" />
+    <ClInclude Include="..\third_party\highway\hwy\targets.h" />
+    <ClInclude Include="..\third_party\highway\hwy\timer-inl.h" />
+    <ClInclude Include="..\third_party\highway\hwy\timer.h" />
+    <ClInclude Include="..\third_party\lcms\src\lcms2_internal.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\lib\jxl\cms\jxl_cms.cc" />
+    <ClCompile Include="..\third_party\highway\hwy\aligned_allocator.cc" />
+    <ClCompile Include="..\third_party\highway\hwy\nanobenchmark.cc" />
+    <ClCompile Include="..\third_party\highway\hwy\per_target.cc" />
+    <ClCompile Include="..\third_party\highway\hwy\print.cc" />
+    <ClCompile Include="..\third_party\highway\hwy\targets.cc" />
+    <ClCompile Include="..\third_party\highway\hwy\timer.cc" />
+    <ClCompile Include="..\third_party\lcms\src\cmsalpha.c" />
+    <ClCompile Include="..\third_party\lcms\src\cmscam02.c" />
+    <ClCompile Include="..\third_party\lcms\src\cmscgats.c" />
+    <ClCompile Include="..\third_party\lcms\src\cmscnvrt.c" />
+    <ClCompile Include="..\third_party\lcms\src\cmserr.c" />
+    <ClCompile Include="..\third_party\lcms\src\cmsgamma.c" />
+    <ClCompile Include="..\third_party\lcms\src\cmsgmt.c" />
+    <ClCompile Include="..\third_party\lcms\src\cmshalf.c" />
+    <ClCompile Include="..\third_party\lcms\src\cmsintrp.c" />
+    <ClCompile Include="..\third_party\lcms\src\cmsio0.c" />
+    <ClCompile Include="..\third_party\lcms\src\cmsio1.c" />
+    <ClCompile Include="..\third_party\lcms\src\cmslut.c" />
+    <ClCompile Include="..\third_party\lcms\src\cmsmd5.c" />
+    <ClCompile Include="..\third_party\lcms\src\cmsmtrx.c" />
+    <ClCompile Include="..\third_party\lcms\src\cmsnamed.c" />
+    <ClCompile Include="..\third_party\lcms\src\cmsopt.c" />
+    <ClCompile Include="..\third_party\lcms\src\cmspack.c" />
+    <ClCompile Include="..\third_party\lcms\src\cmspcs.c" />
+    <ClCompile Include="..\third_party\lcms\src\cmsplugin.c" />
+    <ClCompile Include="..\third_party\lcms\src\cmsps2.c" />
+    <ClCompile Include="..\third_party\lcms\src\cmssamp.c" />
+    <ClCompile Include="..\third_party\lcms\src\cmssm.c" />
+    <ClCompile Include="..\third_party\lcms\src\cmstypes.c" />
+    <ClCompile Include="..\third_party\lcms\src\cmsvirt.c" />
+    <ClCompile Include="..\third_party\lcms\src\cmswtpnt.c" />
+    <ClCompile Include="..\third_party\lcms\src\cmsxform.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\third_party\lcms\src\lcms2.def" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{F50397A6-C50B-4EB1-AE9F-5FFE0F5DC5AE}</ProjectGuid>
+    <RootNamespace>jpegxl</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)$(ProjectName)\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)$(ProjectName)\obj\$(Platform)\$(Configuration)\</IntDir>
+    <IncludePath>$(ProjectDir)\$(ProjectName)_imports;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)$(ProjectName)\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)$(ProjectName)\obj\$(Platform)\$(Configuration)\</IntDir>
+    <IncludePath>$(ProjectDir)\$(ProjectName)_imports;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)$(ProjectName)\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)$(ProjectName)\obj\$(Platform)\$(Configuration)\</IntDir>
+    <IncludePath>$(ProjectDir)\$(ProjectName)_imports;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)$(ProjectName)\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)$(ProjectName)\obj\$(Platform)\$(Configuration)\</IntDir>
+    <IncludePath>$(ProjectDir)\$(ProjectName)_imports;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>JPEGXL_MAJOR_VERSION=0;JPEGXL_MINOR_VERSION=10;JPEGXL_PATCH_VERSION=2;_CRT_SECURE_NO_WARNINGS;BROTLI_SHARED_COMPILATION;_WIN32;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\lib;$(ProjectDir)..\third_party\highway;$(ProjectDir)..\third_party\googletest\googletest\include;$(ProjectDir)..\lib\include;$(ProjectDir)..\third_party\googletest\googlemock\include;$(ProjectDir)..\third_party\brotli\c\include;$(ProjectDir)..\third_party\lcms\include;$(ProjectDir)..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4146</DisableSpecificWarnings>
+      <ObjectFileName>$(IntDir)subdirectory\%(RelativeDir)</ObjectFileName>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(ProjectDir)\brotlicommon\bin\$(Platform)\$(Configuration)\;$(ProjectDir)\brotlienc\bin\$(Platform)\$(Configuration)\;$(ProjectDir)\brotlidec\bin\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>brotlicommon.lib;brotlienc.lib;brotlidec.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>JPEGXL_MAJOR_VERSION=0;JPEGXL_MINOR_VERSION=10;JPEGXL_PATCH_VERSION=2;_CRT_SECURE_NO_WARNINGS;BROTLI_SHARED_COMPILATION;_WIN32;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\lib;$(ProjectDir)..\third_party\highway;$(ProjectDir)..\third_party\googletest\googletest\include;$(ProjectDir)..\lib\include;$(ProjectDir)..\third_party\googletest\googlemock\include;$(ProjectDir)..\third_party\brotli\c\include;$(ProjectDir)..\third_party\lcms\include;$(ProjectDir)..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4146</DisableSpecificWarnings>
+      <ObjectFileName>$(IntDir)subdirectory\%(RelativeDir)</ObjectFileName>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(ProjectDir)\brotlicommon\bin\$(Platform)\$(Configuration)\;$(ProjectDir)\brotlienc\bin\$(Platform)\$(Configuration)\;$(ProjectDir)\brotlidec\bin\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>brotlicommon.lib;brotlienc.lib;brotlidec.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>JPEGXL_MAJOR_VERSION=0;JPEGXL_MINOR_VERSION=10;JPEGXL_PATCH_VERSION=2;_CRT_SECURE_NO_WARNINGS;BROTLI_SHARED_COMPILATION;_WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\lib;$(ProjectDir)..\third_party\highway;$(ProjectDir)..\third_party\googletest\googletest\include;$(ProjectDir)..\lib\include;$(ProjectDir)..\third_party\googletest\googlemock\include;$(ProjectDir)..\third_party\brotli\c\include;$(ProjectDir)..\third_party\lcms\include;$(ProjectDir)..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4146</DisableSpecificWarnings>
+      <ObjectFileName>$(IntDir)subdirectory\%(RelativeDir)</ObjectFileName>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(ProjectDir)\brotlicommon\bin\$(Platform)\$(Configuration)\;$(ProjectDir)\brotlienc\bin\$(Platform)\$(Configuration)\;$(ProjectDir)\brotlidec\bin\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>brotlicommon.lib;brotlienc.lib;brotlidec.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>JPEGXL_MAJOR_VERSION=0;JPEGXL_MINOR_VERSION=10;JPEGXL_PATCH_VERSION=2;_CRT_SECURE_NO_WARNINGS;BROTLI_SHARED_COMPILATION;_WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\lib;$(ProjectDir)..\third_party\highway;$(ProjectDir)..\third_party\googletest\googletest\include;$(ProjectDir)..\lib\include;$(ProjectDir)..\third_party\googletest\googlemock\include;$(ProjectDir)..\third_party\brotli\c\include;$(ProjectDir)..\third_party\lcms\include;$(ProjectDir)..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4146</DisableSpecificWarnings>
+      <ObjectFileName>$(IntDir)subdirectory\%(RelativeDir)</ObjectFileName>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(ProjectDir)\brotlicommon\bin\$(Platform)\$(Configuration)\;$(ProjectDir)\brotlienc\bin\$(Platform)\$(Configuration)\;$(ProjectDir)\brotlidec\bin\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>brotlicommon.lib;brotlienc.lib;brotlidec.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

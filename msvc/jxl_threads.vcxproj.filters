@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{b48457c8-c5b3-44e5-882e-b19dc22285af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lib">
+      <UniqueIdentifier>{95722d80-fe37-4731-86a7-e51112debfec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lib\threads">
+      <UniqueIdentifier>{2c896573-cae0-436e-af77-df7154791930}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{4e28a29a-dfac-4329-8eb7-fd65b4dde2b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\jxl">
+      <UniqueIdentifier>{930bb2ce-108f-4a96-b91e-5f56d7f7555f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\lib">
+      <UniqueIdentifier>{198a3ae7-2463-4022-b403-46cf056897b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\lib\include">
+      <UniqueIdentifier>{10119387-7140-444f-b7dc-1813f2e6bf50}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\lib\threads">
+      <UniqueIdentifier>{0f0f091c-da82-470d-a436-69dcc14042fe}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\lib\threads\resizable_parallel_runner.cc">
+      <Filter>Source Files\lib\threads</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\threads\thread_parallel_runner.cc">
+      <Filter>Source Files\lib\threads</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\threads\thread_parallel_runner_internal.cc">
+      <Filter>Source Files\lib\threads</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="jxl\jxl_threads_export.h">
+      <Filter>Header Files\jxl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\include\jxl\memory_manager.h">
+      <Filter>Header Files\lib\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\include\jxl\parallel_runner.h">
+      <Filter>Header Files\lib\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\threads\thread_parallel_runner_internal.h">
+      <Filter>Header Files\lib\threads</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
