@@ -12,10 +12,12 @@ set -eu
 
 OS=`uname -s`
 
-MYDIR=$(dirname $(realpath "$0"))
+SELF=$(realpath "$0")
+MYDIR=$(dirname "${SELF}")
 
 ### Environment parameters:
-TEST_STACK_LIMIT="${TEST_STACK_LIMIT:-256}"
+# TODO(eustas): tighten; only several items need more than 48KiB
+TEST_STACK_LIMIT="${TEST_STACK_LIMIT:-128}"
 BENCHMARK_NUM_THREADS="${BENCHMARK_NUM_THREADS:-0}"
 BUILD_CONFIG=${BUILD_CONFIG:-}
 CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE:-RelWithDebInfo}
@@ -30,6 +32,7 @@ TARGETS="${TARGETS:-all doc}"
 TEST_SELECTOR="${TEST_SELECTOR:-}"
 BUILD_TARGET="${BUILD_TARGET:-}"
 ENABLE_WASM_SIMD="${ENABLE_WASM_SIMD:-0}"
+CORPUS_DIR="${CORPUS_DIR:-}"
 if [[ -n "${BUILD_TARGET}" ]]; then
   BUILD_DIR="${BUILD_DIR:-${MYDIR}/build-${BUILD_TARGET%%-*}}"
 else
@@ -39,6 +42,7 @@ fi
 POST_MESSAGE_ON_ERROR="${POST_MESSAGE_ON_ERROR:-1}"
 # By default, do a lightweight debian HWY package build.
 HWY_PKG_OPTIONS="${HWY_PKG_OPTIONS:---set-envvar=HWY_EXTRA_CONFIG=-DBUILD_TESTING=OFF -DHWY_ENABLE_EXAMPLES=OFF -DHWY_ENABLE_CONTRIB=OFF}"
+EXCLUDE_DEBIAN_PACKAGES="${EXCLUDE_DEBIAN_PACKAGES:-}"
 
 # Set default compilers to clang if not already set
 export CC=${CC:-clang}
@@ -296,7 +300,7 @@ export_env() {
 cmake_configure() {
   export_env
 
-  if [[ "${STACK_SIZE:-0}" == 1 ]]; then
+  if [[ "${EMIT_STACK_SIZES:-0}" == 1 ]]; then
     # Dump the stack size of each function in the .stack_sizes section for
     # analysis.
     CMAKE_C_FLAGS+=" -fstack-size-section"
@@ -521,6 +525,7 @@ cmd_coverage_report() {
   local gcovr_args=(
     -r "${real_build_dir}"
     --gcov-executable "${LLVM_COV} gcov"
+    --gcov-ignore-parse-errors suspicious_hits.warn_once_per_file
     # Only print coverage information for the libjxl directories. The rest
     # is not part of the code under test.
     --filter '.*jxl/.*'
@@ -707,7 +712,9 @@ cmd_msan_install() {
       ["15"]="15.0.7"
       ["16"]="16.0.6"
       ["17"]="17.0.6"
-      ["18"]="18.1.6"
+      ["18"]="18.1.8"
+      ["19"]="19.1.7"
+      ["20"]="20.1.2"
     ) 
     local llvm_tag="${CLANG_VERSION}.0.0"
     if [[ -n "${llvm_tag_by_version["${CLANG_VERSION}"]}" ]]; then
@@ -839,11 +846,17 @@ cmd_fast_benchmark() {
     curl --show-error -o "${small_corpus_tar}" "${small_corpus_url}"
   fi
 
-  local tmpdir=$(mktemp -d)
-  CLEANUP_FILES+=("${tmpdir}")
-  tar -xf "${small_corpus_tar}" -C "${tmpdir}"
+  local corpus_dir="${CORPUS_DIR}"
+  if [[ -z "${CORPUS_DIR}" ]]; then
+    corpus_dir=$(mktemp -d)
+    CLEANUP_FILES+=("${corpus_dir}")
+  else
+    mkdir -p "${corpus_dir}"
+  fi
 
-  run_benchmark "${tmpdir}" 1048576
+  tar -xf "${small_corpus_tar}" -C "${corpus_dir}"
+
+  run_benchmark "${corpus_dir}" 1048576
 }
 
 cmd_benchmark() {
@@ -852,9 +865,15 @@ cmd_benchmark() {
   curl --show-error -o "${nikon_corpus_tar}" -z "${nikon_corpus_tar}" \
     "https://storage.googleapis.com/artifacts.jpegxl.appspot.com/corpora/nikon-subset.tar"
 
-  local tmpdir=$(mktemp -d)
-  CLEANUP_FILES+=("${tmpdir}")
-  tar -xvf "${nikon_corpus_tar}" -C "${tmpdir}"
+  local corpus_dir="${CORPUS_DIR}"
+  if [[ -z "${CORPUS_DIR}" ]]; then
+    corpus_dir=$(mktemp -d)
+    CLEANUP_FILES+=("${corpus_dir}")
+  else
+    mkdir -p "${corpus_dir}"
+  fi
+
+  tar -xvf "${nikon_corpus_tar}" -C "${corpus_dir}"
 
   local sem_id="jpegxl_benchmark-$$"
   local nprocs=$(nproc --all || echo 1)
@@ -876,13 +895,13 @@ cmd_benchmark() {
     png_filename=$(echo "${png_filename}" | tr '/' '_')
     sem --bg --id "${sem_id}" -j"${nprocs}" -- \
       "${TOOLS_DIR}/decode_and_encode" \
-        "${tmpdir}/${filename}" "${mode}" "${tmpdir}/${png_filename}"
+        "${corpus_dir}/${filename}" "${mode}" "${corpus_dir}/${png_filename}"
     images+=( "${png_filename}" )
-  done < <(cd "${tmpdir}"; ${FIND_BIN} . -name '*.ppm' -type f)
+  done < <(cd "${corpus_dir}"; ${FIND_BIN} . -name '*.ppm' -type f)
   sem --id "${sem_id}" --wait
 
   # We need about 10 GiB per thread on these images.
-  run_benchmark "${tmpdir}" 10485760
+  run_benchmark "${corpus_dir}" 10485760
 }
 
 get_mem_available() {
@@ -1192,7 +1211,7 @@ cmd_fuzz() {
 cmd_lint() {
   merge_request_commits
   { set +x; } 2>/dev/null
-  local versions=(${1:-16 15 14 13 12 11 10 9 8 7 6.0})
+  local versions=(${1:-18 17 16 15 14 13 12 11 10 9 8 7 6.0})
   local clang_format_bins=("${versions[@]/#/clang-format-}" clang-format)
   local tmpdir=$(mktemp -d)
   CLEANUP_FILES+=("${tmpdir}")
@@ -1209,7 +1228,7 @@ cmd_lint() {
   # It is ok, if buildifier is not installed.
   if which buildifier >/dev/null; then
     local buildifier_patch="${tmpdir}/buildifier.patch"
-    local bazel_files=`git -C ${MYDIR} ls-files | grep -E "/BUILD$|WORKSPACE|.bzl$"`
+    local bazel_files=`git -C "${MYDIR}" ls-files | grep -E "/BUILD$|WORKSPACE|.bzl$"`
     set -x
     buildifier -d ${bazel_files} >"${buildifier_patch}"|| true
     { set +x; } 2>/dev/null
@@ -1225,8 +1244,8 @@ cmd_lint() {
   # It is ok, if spell-checker is not installed.
   if which typos >/dev/null; then
     local src_ext="bazel|bzl|c|cc|cmake|gni|h|html|in|java|js|m|md|nix|py|rst|sh|ts|txt|yaml|yml"
-    local sources=`git -C ${MYDIR} ls-files | grep -E "\.(${src_ext})$"`
-    typos -c ${MYDIR}/tools/scripts/typos.toml ${sources}
+    local sources=`git -C "${MYDIR}" ls-files | grep -E "\.(${src_ext})$"`
+    typos -c "${MYDIR}/tools/scripts/typos.toml" ${sources}
   else
     echo "Consider installing https://github.com/crate-ci/typos for spell-checking"
   fi
@@ -1369,6 +1388,11 @@ build_debian_pkg() {
       ln -s "${srcdir}/$f" "${builddir}/$f"
     fi
   done
+  if [[ -n "${EXCLUDE_DEBIAN_PACKAGES}" ]]; then
+    # TODO(eustas): support comma-separated list
+    rm -f "${builddir}"/debian/${EXCLUDE_DEBIAN_PACKAGES}.install
+    sed -i "/Package: ${EXCLUDE_DEBIAN_PACKAGES}/,/\n/d" "${builddir}"/debian/control
+  fi
   (
     cd "${builddir}"
     debuild "${options}" -b -uc -us
@@ -1522,7 +1546,7 @@ You can pass some optional environment variables as well:
  - STORE_IMAGES=0: Makes the benchmark discard the computed images.
  - TEST_STACK_LIMIT: Stack size limit (ulimit -s) during tests, in KiB.
  - TEST_SELECTOR: pass additional arguments to ctest, e.g. "-R .Resample.".
- - STACK_SIZE=1: Generate binaries with the .stack_sizes sections.
+ - EMIT_STACK_SIZES=1: Generate binaries with the .stack_sizes sections.
 
 These optional environment variables are forwarded to the cmake call as
 parameters:

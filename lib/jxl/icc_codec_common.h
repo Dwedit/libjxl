@@ -20,7 +20,7 @@ class PaddedBytes;
 
 static constexpr size_t kICCHeaderSize = 128;
 
-typedef std::array<uint8_t, 4> Tag;
+using Tag = std::array<uint8_t, 4>;
 
 static const Tag kAcspTag = {{'a', 'c', 's', 'p'}};
 static const Tag kBkptTag = {{'b', 'k', 'p', 't'}};
@@ -84,10 +84,10 @@ static constexpr size_t kFlagBitSize = 128;
 static constexpr size_t kNumICCContexts = 41;
 
 uint32_t DecodeUint32(const uint8_t* data, size_t size, size_t pos);
-void AppendUint32(uint32_t value, PaddedBytes* data);
+Status AppendUint32(uint32_t value, PaddedBytes* data);
 Tag DecodeKeyword(const uint8_t* data, size_t size, size_t pos);
 void EncodeKeyword(const Tag& keyword, uint8_t* data, size_t size, size_t pos);
-void AppendKeyword(const Tag& keyword, PaddedBytes* data);
+Status AppendKeyword(const Tag& keyword, PaddedBytes* data);
 
 // Checks if a + b > size, taking possible integer overflow into account.
 Status CheckOutOfBounds(uint64_t a, uint64_t b, uint64_t size);

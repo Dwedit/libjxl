@@ -12,6 +12,7 @@
 
 #include <cstddef>
 #include <memory>
+#include <utility>
 
 #include "lib/jxl/base/compiler_specific.h"
 #include "lib/jxl/base/status.h"
@@ -69,9 +70,9 @@ template <typename T>
 using MemoryManagerUniquePtr = std::unique_ptr<T, MemoryManagerDeleteHelper>;
 
 // Creates a new object T allocating it with the memory allocator into a
-// unique_ptr.
+// unique_ptr; not to be used outside JXL_MEMORY_MANAGER_MAKE_UNIQUE_OR_RETURN.
 template <typename T, typename... Args>
-JXL_INLINE MemoryManagerUniquePtr<T> MemoryManagerMakeUnique(
+JXL_INLINE MemoryManagerUniquePtr<T> MemoryManagerMakeUniquePrivate(
     const JxlMemoryManager* memory_manager, Args&&... args) {
   T* mem =
       static_cast<T*>(memory_manager->alloc(memory_manager->opaque, sizeof(T)));
@@ -83,6 +84,16 @@ JXL_INLINE MemoryManagerUniquePtr<T> MemoryManagerMakeUnique(
   return MemoryManagerUniquePtr<T>(new (mem) T(std::forward<Args>(args)...),
                                    MemoryManagerDeleteHelper(memory_manager));
 }
+
+// NOLINTBEGIN(bugprone-macro-parentheses)
+// NB: ARGS should be in parentheses on instantiation side; it contains
+//     arguments for MemoryManagerMakeUniquePrivate, including `memory_manager`.
+#define JXL_MEMORY_MANAGER_MAKE_UNIQUE_OR_RETURN(NAME, TYPE, ARGS, RETURN) \
+  auto NAME = ::jxl::MemoryManagerMakeUniquePrivate<TYPE> ARGS;            \
+  if (!NAME) {                                                             \
+    return RETURN;                                                         \
+  }
+// NOLINTEND(bugprone-macro-parentheses)
 
 // Returns recommended distance in bytes between the start of two consecutive
 // rows.
@@ -106,6 +117,8 @@ class AlignedMemory {
   static StatusOr<AlignedMemory> Create(JxlMemoryManager* memory_manager,
                                         size_t size, size_t pre_padding = 0);
 
+  explicit operator bool() const noexcept { return (address_ != nullptr); }
+
   template <typename T>
   T* address() const {
     return reinterpret_cast<T*>(address_);
@@ -123,6 +136,66 @@ class AlignedMemory {
   void* allocation_;
   JxlMemoryManager* memory_manager_;
   void* address_;
+};
+
+template <typename T>
+class AlignedArray {
+ public:
+  AlignedArray() : size_(0) {}
+
+  static StatusOr<AlignedArray> Create(JxlMemoryManager* memory_manager,
+                                       size_t size) {
+    size_t storage_size = size * sizeof(T);
+    JXL_ASSIGN_OR_RETURN(AlignedMemory storage,
+                         AlignedMemory::Create(memory_manager, storage_size));
+    T* items = storage.address<T>();
+    for (size_t i = 0; i < size; ++i) {
+      new (items + i) T();
+    }
+    return AlignedArray<T>(std::move(storage), size);
+  }
+
+  // Copy disallowed.
+  AlignedArray(const AlignedArray& other) = delete;
+  AlignedArray& operator=(const AlignedArray& other) = delete;
+
+  // Custom move.
+  AlignedArray(AlignedArray&& other) noexcept {
+    size_ = other.size_;
+    storage_ = std::move(other.storage_);
+    other.size_ = 0;
+  }
+
+  AlignedArray& operator=(AlignedArray&& other) noexcept {
+    if (this == &other) return *this;
+    size_ = other.size_;
+    storage_ = std::move(other.storage_);
+    other.size_ = 0;
+    return *this;
+  }
+
+  ~AlignedArray() {
+    if (!size_) return;
+    T* items = storage_.address<T>();
+    for (size_t i = 0; i < size_; ++i) {
+      items[i].~T();
+    }
+  }
+
+  T& operator[](const size_t i) {
+    JXL_DASSERT(i < size_);
+    return *(storage_.address<T>() + i);
+  }
+  const T& operator[](const size_t i) const {
+    JXL_DASSERT(i < size_);
+    return *(storage_.address<T>() + i);
+  }
+
+ private:
+  explicit AlignedArray(AlignedMemory&& storage, size_t size)
+      : size_(size), storage_(std::move(storage)) {}
+  size_t size_;
+  AlignedMemory storage_;
 };
 
 }  // namespace jxl

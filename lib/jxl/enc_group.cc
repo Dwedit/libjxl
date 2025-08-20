@@ -5,7 +5,22 @@
 
 #include "lib/jxl/enc_group.h"
 
-#include <hwy/aligned_allocator.h>
+#include <jxl/memory_manager.h>
+
+#include <algorithm>
+#include <cmath>
+#include <cstddef>
+#include <cstdint>
+#include <cstdlib>
+
+#include "lib/jxl/base/common.h"
+#include "lib/jxl/base/status.h"
+#include "lib/jxl/chroma_from_luma.h"
+#include "lib/jxl/coeff_order_fwd.h"
+#include "lib/jxl/enc_ans.h"
+#include "lib/jxl/enc_bit_writer.h"
+#include "lib/jxl/frame_dimensions.h"
+#include "lib/jxl/memory_manager_internal.h"
 
 #undef HWY_TARGET_INCLUDE
 #define HWY_TARGET_INCLUDE "lib/jxl/enc_group.cc"
@@ -357,8 +372,8 @@ void QuantizeRoundtripYBlockAC(PassesEncoderState* enc_state, const size_t size,
   HWY_CAPPED(int32_t, kDCTBlockSize) di;
   const auto inv_qac = Set(df, quantizer.inv_quant_ac(*quant));
   for (size_t k = 0; k < kDCTBlockSize * xsize * ysize; k += Lanes(df)) {
-    const auto quant = Load(di, quantized + size + k);
-    const auto adj_quant = AdjustQuantBias(di, 1, quant, biases);
+    const auto oquant = Load(di, quantized + size + k);
+    const auto adj_quant = AdjustQuantBias(di, 1, oquant, biases);
     const auto dequantm = Load(df, dequant_matrix + k);
     Store(Mul(Mul(adj_quant, dequantm), inv_qac), df, inout + size + k);
   }
@@ -367,6 +382,7 @@ void QuantizeRoundtripYBlockAC(PassesEncoderState* enc_state, const size_t size,
 Status ComputeCoefficients(size_t group_idx, PassesEncoderState* enc_state,
                            const Image3F& opsin, const Rect& rect,
                            Image3F* dc) {
+  JxlMemoryManager* memory_manager = opsin.memory_manager();
   const Rect block_group_rect =
       enc_state->shared.frame_dim.BlockGroupRect(group_idx);
   const Rect cmap_rect(
@@ -391,11 +407,15 @@ Status ComputeCoefficients(size_t group_idx, PassesEncoderState* enc_state,
       3 * (MaxVectorSize() / sizeof(float)) * AcStrategy::kMaxBlockDim;
 
   // TODO(veluca): consider strategies to reduce this memory.
-  auto mem = hwy::AllocateAligned<int32_t>(3 * AcStrategy::kMaxCoeffArea);
-  auto fmem = hwy::AllocateAligned<float>(5 * AcStrategy::kMaxCoeffArea +
-                                          dct_scratch_size);
+  size_t mem_bytes = 3 * AcStrategy::kMaxCoeffArea * sizeof(int32_t);
+  JXL_ASSIGN_OR_RETURN(auto mem,
+                       AlignedMemory::Create(memory_manager, mem_bytes));
+  size_t fmem_bytes =
+      (5 * AcStrategy::kMaxCoeffArea + dct_scratch_size) * sizeof(float);
+  JXL_ASSIGN_OR_RETURN(auto fmem,
+                       AlignedMemory::Create(memory_manager, fmem_bytes));
   float* JXL_RESTRICT scratch_space =
-      fmem.get() + 3 * AcStrategy::kMaxCoeffArea;
+      fmem.address<float>() + 3 * AcStrategy::kMaxCoeffArea;
   {
     // Only use error diffusion in Squirrel mode or slower.
     const bool error_diffusion = cparams.speed_tier <= SpeedTier::kSquirrel;
@@ -412,8 +432,8 @@ Status ComputeCoefficients(size_t group_idx, PassesEncoderState* enc_state,
       }
     }
 
-    HWY_ALIGN float* coeffs_in = fmem.get();
-    HWY_ALIGN int32_t* quantized = mem.get();
+    HWY_ALIGN float* coeffs_in = fmem.address<float>();
+    HWY_ALIGN int32_t* quantized = mem.address<int32_t>();
 
     for (size_t by = 0; by < ysize_blocks; ++by) {
       int32_t* JXL_RESTRICT row_quant_ac =
@@ -462,7 +482,7 @@ Status ComputeCoefficients(size_t group_idx, PassesEncoderState* enc_state,
                                 scratch_space);
           }
           DCFromLowestFrequencies(acs.Strategy(), coeffs_in + size,
-                                  dc_rows[1] + bx, dc_stride);
+                                  dc_rows[1] + bx, dc_stride, scratch_space);
 
           QuantizeRoundtripYBlockAC(
               enc_state, size, enc_state->shared.quantizer, error_diffusion,
@@ -490,7 +510,7 @@ Status ComputeCoefficients(size_t group_idx, PassesEncoderState* enc_state,
                             coeffs_in + c * size, &quant_ac,
                             quantized + c * size);
             DCFromLowestFrequencies(acs.Strategy(), coeffs_in + c * size,
-                                    dc_rows[c] + bx, dc_stride);
+                                    dc_rows[c] + bx, dc_stride, scratch_space);
           }
           row_quant_ac[bx] = quant_ac;
           for (size_t c = 0; c < 3; c++) {
@@ -533,17 +553,18 @@ Status EncodeGroupTokenizedCoefficients(size_t group_idx, size_t pass_idx,
   size_t histo_selector_bits = CeilLog2Nonzero(num_histograms);
 
   if (histo_selector_bits != 0) {
-    BitWriter::Allotment allotment(writer, histo_selector_bits);
-    writer->Write(histo_selector_bits, histogram_idx);
     JXL_RETURN_IF_ERROR(
-        allotment.ReclaimAndCharge(writer, LayerType::Ac, aux_out));
+        writer->WithMaxBits(histo_selector_bits, LayerType::Ac, aux_out, [&] {
+          writer->Write(histo_selector_bits, histogram_idx);
+          return true;
+        }));
   }
   size_t context_offset =
       histogram_idx * enc_state.shared.block_ctx_map.NumACContexts();
-  JXL_RETURN_IF_ERROR(WriteTokens(
-      enc_state.passes[pass_idx].ac_tokens[group_idx],
-      enc_state.passes[pass_idx].codes, enc_state.passes[pass_idx].context_map,
-      context_offset, writer, LayerType::AcTokens, aux_out));
+  JXL_RETURN_IF_ERROR(
+      WriteTokens(enc_state.passes[pass_idx].ac_tokens[group_idx],
+                  enc_state.passes[pass_idx].codes, context_offset, writer,
+                  LayerType::AcTokens, aux_out));
 
   return true;
 }

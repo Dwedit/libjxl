@@ -9,6 +9,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <memory>
 
 #include "lib/jxl/base/common.h"
 #include "lib/jxl/base/compiler_specific.h"
@@ -34,17 +35,18 @@ void TestU32Coder(const uint32_t value, const size_t expected_bits_written) {
   const U32Enc enc(Val(0), Bits(4), Val(0x7FFFFFFF), Bits(32));
 
   BitWriter writer{memory_manager};
-  BitWriter::Allotment allotment(
-      &writer, RoundUpBitsToByteMultiple(U32Coder::MaxEncodedBits(enc)));
+  ASSERT_TRUE(writer.WithMaxBits(
+      RoundUpBitsToByteMultiple(U32Coder::MaxEncodedBits(enc)),
+      LayerType::Header, nullptr, [&] {
+        size_t precheck_pos;
+        EXPECT_TRUE(U32Coder::CanEncode(enc, value, &precheck_pos));
+        EXPECT_EQ(expected_bits_written, precheck_pos);
 
-  size_t precheck_pos;
-  EXPECT_TRUE(U32Coder::CanEncode(enc, value, &precheck_pos));
-  EXPECT_EQ(expected_bits_written, precheck_pos);
-
-  EXPECT_TRUE(U32Coder::Write(enc, value, &writer));
-  EXPECT_EQ(expected_bits_written, writer.BitsWritten());
-  writer.ZeroPadToByte();
-  ASSERT_TRUE(allotment.ReclaimAndCharge(&writer, LayerType::Header, nullptr));
+        EXPECT_TRUE(U32Coder::Write(enc, value, &writer));
+        EXPECT_EQ(expected_bits_written, writer.BitsWritten());
+        writer.ZeroPadToByte();
+        return true;
+      }));
 
   BitReader reader(writer.GetSpan());
   const uint32_t decoded_value = U32Coder::Read(enc, &reader);
@@ -66,18 +68,19 @@ TEST(FieldsTest, U32CoderTest) {
 void TestU64Coder(const uint64_t value, const size_t expected_bits_written) {
   JxlMemoryManager* memory_manager = jxl::test::MemoryManager();
   BitWriter writer{memory_manager};
-  BitWriter::Allotment allotment(
-      &writer, RoundUpBitsToByteMultiple(U64Coder::MaxEncodedBits()));
+  ASSERT_TRUE(writer.WithMaxBits(
+      RoundUpBitsToByteMultiple(U64Coder::MaxEncodedBits()), LayerType::Header,
+      nullptr, [&] {
+        size_t precheck_pos;
+        EXPECT_TRUE(U64Coder::CanEncode(value, &precheck_pos));
+        EXPECT_EQ(expected_bits_written, precheck_pos);
 
-  size_t precheck_pos;
-  EXPECT_TRUE(U64Coder::CanEncode(value, &precheck_pos));
-  EXPECT_EQ(expected_bits_written, precheck_pos);
+        EXPECT_TRUE(U64Coder::Write(value, &writer));
+        EXPECT_EQ(expected_bits_written, writer.BitsWritten());
 
-  EXPECT_TRUE(U64Coder::Write(value, &writer));
-  EXPECT_EQ(expected_bits_written, writer.BitsWritten());
-
-  writer.ZeroPadToByte();
-  ASSERT_TRUE(allotment.ReclaimAndCharge(&writer, LayerType::Header, nullptr));
+        writer.ZeroPadToByte();
+        return true;
+      }));
 
   BitReader reader(writer.GetSpan());
   const uint64_t decoded_value = U64Coder::Read(&reader);
@@ -172,13 +175,14 @@ Status TestF16Coder(const float value) {
   EXPECT_EQ(F16Coder::MaxEncodedBits(), max_encoded_bits);
 
   BitWriter writer{memory_manager};
-  BitWriter::Allotment allotment(&writer,
-                                 RoundUpBitsToByteMultiple(max_encoded_bits));
-
-  EXPECT_TRUE(F16Coder::Write(value, &writer));
-  EXPECT_EQ(F16Coder::MaxEncodedBits(), writer.BitsWritten());
-  writer.ZeroPadToByte();
-  EXPECT_TRUE(allotment.ReclaimAndCharge(&writer, LayerType::Header, nullptr));
+  EXPECT_TRUE(writer.WithMaxBits(RoundUpBitsToByteMultiple(max_encoded_bits),
+                                 LayerType::Header, nullptr, [&] {
+                                   EXPECT_TRUE(F16Coder::Write(value, &writer));
+                                   EXPECT_EQ(F16Coder::MaxEncodedBits(),
+                                             writer.BitsWritten());
+                                   writer.ZeroPadToByte();
+                                   return true;
+                                 }));
 
   BitReader reader(writer.GetSpan());
   float decoded_value;
@@ -233,9 +237,9 @@ TEST(FieldsTest, TestRoundtripSize) {
 
 // Ensure all values can be reached by the encoding.
 TEST(FieldsTest, TestCropRect) {
-  CodecMetadata metadata;
+  auto metadata = std::make_unique<CodecMetadata>();
   for (int32_t i = -999; i < 19000; ++i) {
-    FrameHeader f(&metadata);
+    FrameHeader f(metadata.get());
     f.custom_size_or_origin = true;
     f.frame_origin.x0 = i;
     f.frame_origin.y0 = i;
@@ -264,8 +268,8 @@ TEST(FieldsTest, TestPreview) {
 // Ensures Read(Write()) returns the same fields.
 TEST(FieldsTest, TestRoundtripFrame) {
   JxlMemoryManager* memory_manager = jxl::test::MemoryManager();
-  CodecMetadata metadata;
-  FrameHeader h(&metadata);
+  auto metadata = jxl::make_unique<CodecMetadata>();
+  FrameHeader h(metadata.get());
   h.extensions = 0x800;
 
   size_t extension_bits = 999;
@@ -277,7 +281,7 @@ TEST(FieldsTest, TestRoundtripFrame) {
   EXPECT_EQ(total_bits, writer.BitsWritten());
   writer.ZeroPadToByte();
 
-  FrameHeader h2(&metadata);
+  FrameHeader h2(metadata.get());
   BitReader reader(writer.GetSpan());
   ASSERT_TRUE(ReadFrameHeader(&reader, &h2));
   EXPECT_EQ(total_bits, reader.TotalBitsConsumed());
@@ -375,11 +379,12 @@ TEST(FieldsTest, TestNewDecoderOldData) {
   AuxOut aux_out;
   ASSERT_TRUE(Bundle::Write(old_bundle, &writer, LayerType::Header, &aux_out));
 
-  BitWriter::Allotment allotment(&writer,
-                                 kMaxOutBytes * kBitsPerByte - total_bits);
-  writer.Write(20, 0xA55A);  // sentinel
-  writer.ZeroPadToByte();
-  ASSERT_TRUE(allotment.ReclaimAndCharge(&writer, LayerType::Header, nullptr));
+  ASSERT_TRUE(writer.WithMaxBits(kMaxOutBytes * kBitsPerByte - total_bits,
+                                 LayerType::Header, nullptr, [&] {
+                                   writer.Write(20, 0xA55A);  // sentinel
+                                   writer.ZeroPadToByte();
+                                   return true;
+                                 }));
 
   Bytes bytes = writer.GetSpan();
   ASSERT_LE(bytes.size(), kMaxOutBytes);
@@ -423,13 +428,14 @@ TEST(FieldsTest, TestOldDecoderNewData) {
   ASSERT_LE(aux_out.layer(LayerType::Header).total_bits,
             kMaxOutBytes * kBitsPerByte);
 
-  BitWriter::Allotment allotment(
-      &writer, kMaxOutBytes * kBitsPerByte -
-                   aux_out.layer(LayerType::Header).total_bits);
-  // Ensure Read skips the additional fields
-  writer.Write(20, 0xA55A);  // sentinel
-  writer.ZeroPadToByte();
-  ASSERT_TRUE(allotment.ReclaimAndCharge(&writer, LayerType::Header, nullptr));
+  ASSERT_TRUE(writer.WithMaxBits(
+      kMaxOutBytes * kBitsPerByte - aux_out.layer(LayerType::Header).total_bits,
+      LayerType::Header, nullptr, [&] {
+        // Ensure Read skips the additional fields
+        writer.Write(20, 0xA55A);  // sentinel
+        writer.ZeroPadToByte();
+        return true;
+      }));
 
   BitReader reader(writer.GetSpan());
   OldBundle old_bundle;

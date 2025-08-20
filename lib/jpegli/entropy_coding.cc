@@ -5,12 +5,23 @@
 
 #include "lib/jpegli/entropy_coding.h"
 
+#include <jxl/types.h>
+
+#include <algorithm>
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <limits>
 #include <vector>
 
+#include "lib/jpegli/common.h"
+#include "lib/jpegli/common_internal.h"
 #include "lib/jpegli/encode_internal.h"
 #include "lib/jpegli/error.h"
 #include "lib/jpegli/huffman.h"
+#include "lib/jpegli/memory_manager.h"
 #include "lib/jxl/base/bits.h"
+#include "lib/jxl/base/status.h"
 
 #undef HWY_TARGET_INCLUDE
 #define HWY_TARGET_INCLUDE "lib/jpegli/entropy_coding.cc"
@@ -441,18 +452,19 @@ void TokenizeJpeg(j_compress_ptr cinfo) {
   std::vector<int> processed(cinfo->num_scans);
   size_t max_refinement_tokens = 0;
   size_t num_refinement_bits = 0;
-  int num_refinement_scans[DCTSIZE2] = {};
+  int num_refinement_scans[kMaxComponents][DCTSIZE2] = {};
   int max_num_refinement_scans = 0;
   for (int i = 0; i < cinfo->num_scans; ++i) {
     const jpeg_scan_info* si = &cinfo->scan_info[i];
     ScanTokenInfo* sti = &m->scan_token_info[i];
     if (si->Ss > 0 && si->Ah == 0 && si->Al > 0) {
       int offset = m->ac_ctx_offset[i];
+      int comp_idx = si->component_index[0];
       TokenizeScan(cinfo, i, offset, sti);
       processed[i] = 1;
       max_refinement_tokens += sti->num_future_nonzeros;
       for (int k = si->Ss; k <= si->Se; ++k) {
-        num_refinement_scans[k] = si->Al;
+        num_refinement_scans[comp_idx][k] = si->Al;
       }
       max_num_refinement_scans = std::max(max_num_refinement_scans, si->Al);
       num_refinement_bits += sti->num_nonzeros;
@@ -475,16 +487,17 @@ void TokenizeJpeg(j_compress_ptr cinfo) {
     size_t new_refinement_bits = 0;
     for (int i = 0; i < cinfo->num_scans; ++i) {
       const jpeg_scan_info* si = &cinfo->scan_info[i];
+      int comp_idx = si->component_index[0];
       ScanTokenInfo* sti = &m->scan_token_info[i];
       if (si->Ss > 0 && si->Ah > 0 &&
-          si->Ah == num_refinement_scans[si->Ss] - j) {
+          si->Ah == num_refinement_scans[comp_idx][si->Ss] - j) {
         int offset = m->ac_ctx_offset[i];
         TokenizeScan(cinfo, i, offset, sti);
         processed[i] = 1;
         new_refinement_bits += sti->num_nonzeros;
       }
     }
-    JXL_DASSERT(m->next_refinement_bit ==
+    JXL_DASSERT(m->next_refinement_bit <=
                 refinement_bits + num_refinement_bits);
     num_refinement_bits += new_refinement_bits;
   }
@@ -573,13 +586,21 @@ void ClusterJpegHistograms(j_compress_ptr cinfo, const Histogram* histograms,
   clusters->histogram_indexes.resize(num);
   std::vector<uint32_t> slot_histograms;
   std::vector<float> slot_costs;
+  // Since not all jpeg decoders support the extended sequential mode, i.e. the
+  // 0xff 0xc1 SOF marker, we will limit the number of clusters to 2 in
+  // sequential mode, unless the quantization tables already require the
+  // extended sequential mode.
+  const bool force_baseline =
+      !cinfo->progressive_mode && cinfo->master->force_baseline;
   for (size_t i = 0; i < num; ++i) {
     const Histogram& cur = histograms[i];
     if (IsEmptyHistogram(cur)) {
       continue;
     }
-    float best_cost = HistogramCost(cur);
     size_t best_slot = slot_histograms.size();
+    float best_cost = force_baseline && best_slot > 1
+                          ? std::numeric_limits<float>::max()
+                          : HistogramCost(cur);
     for (size_t j = 0; j < slot_histograms.size(); ++j) {
       size_t prev_idx = slot_histograms[j];
       const Histogram& prev = clusters->histograms[prev_idx];
@@ -602,7 +623,7 @@ void ClusterJpegHistograms(j_compress_ptr cinfo, const Histogram* histograms,
         slot_histograms.push_back(histogram_index);
         slot_costs.push_back(best_cost);
       } else {
-        // TODO(szabadka) Find the best histogram to replce.
+        // TODO(szabadka) Find the best histogram to replace.
         best_slot = (clusters->slot_ids.back() + 1) % 4;
       }
       slot_histograms[best_slot] = histogram_index;

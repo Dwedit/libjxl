@@ -12,6 +12,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <functional>
 #include <memory>
 #include <utility>
 #include <vector>
@@ -60,7 +61,10 @@ struct BitWriter {
   PaddedBytes&& TakeBytes() && {
     // Callers must ensure byte alignment to avoid uninitialized bits.
     JXL_DASSERT(bits_written_ % kBitsPerByte == 0);
-    storage_.resize(DivCeil(bits_written_, kBitsPerByte));
+    Status status = storage_.resize(DivCeil(bits_written_, kBitsPerByte));
+    JXL_DASSERT(status);
+    // Can never fail, because we are resizing to a lower size.
+    (void)status;
     return std::move(storage_);
   }
 
@@ -72,39 +76,6 @@ struct BitWriter {
       const std::vector<std::unique_ptr<BitWriter>>& others);
 
   Status AppendUnaligned(const BitWriter& other);
-
-  class Allotment {
-   public:
-    // Expands a BitWriter's storage. Must happen before calling Write or
-    // ZeroPadToByte. Must call ReclaimUnused after writing to reclaim the
-    // unused storage so that BitWriter memory use remains tightly bounded.
-    Allotment(BitWriter* JXL_RESTRICT writer, size_t max_bits);
-    ~Allotment();
-
-    size_t MaxBits() const { return max_bits_; }
-
-    // Call after writing a histogram, but before ReclaimUnused.
-    Status FinishedHistogram(BitWriter* JXL_RESTRICT writer);
-
-    size_t HistogramBits() const {
-      JXL_DASSERT(called_);
-      return histogram_bits_;
-    }
-
-    Status ReclaimAndCharge(BitWriter* JXL_RESTRICT writer, LayerType layer,
-                            AuxOut* JXL_RESTRICT aux_out);
-
-   private:
-    Status PrivateReclaim(BitWriter* JXL_RESTRICT writer,
-                          size_t* JXL_RESTRICT used_bits,
-                          size_t* JXL_RESTRICT unused_bits);
-
-    size_t prev_bits_written_;
-    const size_t max_bits_;
-    size_t histogram_bits_ = 0;
-    bool called_ = false;
-    Allotment* parent_;
-  };
 
   // Writes bits into bytes in increasing addresses, and within a byte
   // least-significant-bit first.
@@ -123,7 +94,52 @@ struct BitWriter {
     JXL_DASSERT(bits_written_ % kBitsPerByte == 0);
   }
 
+  Status WithMaxBits(size_t max_bits, LayerType layer,
+                     AuxOut* JXL_RESTRICT aux_out,
+                     const std::function<Status()>& function,
+                     bool finished_histogram = false);
+
  private:
+  class Allotment {
+   public:
+    explicit Allotment(size_t max_bits);
+    ~Allotment();
+
+    Allotment(const Allotment& other) = delete;
+    Allotment(Allotment&& other) = delete;
+    Allotment& operator=(const Allotment&) = delete;
+    Allotment& operator=(Allotment&&) = delete;
+
+    // Call after writing a histogram, but before ReclaimUnused.
+    Status FinishedHistogram(BitWriter* JXL_RESTRICT writer);
+
+    size_t HistogramBits() const {
+      JXL_DASSERT(called_);
+      return histogram_bits_;
+    }
+
+    Status ReclaimAndCharge(BitWriter* JXL_RESTRICT writer, LayerType layer,
+                            AuxOut* JXL_RESTRICT aux_out);
+
+   private:
+    friend struct BitWriter;
+
+    // Expands a BitWriter's storage. Must happen before calling Write or
+    // ZeroPadToByte. Must call ReclaimUnused after writing to reclaim the
+    // unused storage so that BitWriter memory use remains tightly bounded.
+    Status Init(BitWriter* JXL_RESTRICT writer);
+
+    Status PrivateReclaim(BitWriter* JXL_RESTRICT writer,
+                          size_t* JXL_RESTRICT used_bits,
+                          size_t* JXL_RESTRICT unused_bits);
+
+    size_t prev_bits_written_;
+    const size_t max_bits_;
+    size_t histogram_bits_ = 0;
+    bool called_ = false;
+    Allotment* parent_;
+  };
+
   size_t bits_written_;
   PaddedBytes storage_;
   Allotment* current_allotment_ = nullptr;

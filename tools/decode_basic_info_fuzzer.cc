@@ -3,28 +3,48 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+#include <jxl/codestream_header.h>
 #include <jxl/decode.h>
 
 #include <cstddef>
 #include <cstdint>
+#include <cstdio>
 #include <vector>
 
+#include "lib/jxl/base/compiler_specific.h"
 #include "lib/jxl/fuzztest.h"
+#include "tools/tracking_memory_manager.h"
 
 namespace {
 
+using ::jpegxl::tools::kGiB;
+using ::jpegxl::tools::TrackingMemoryManager;
+
+void CheckImpl(bool ok, const char* conndition, const char* file, int line) {
+  if (!ok) {
+    fprintf(stderr, "Check(%s) failed at %s:%d\n", conndition, file, line);
+    JXL_CRASH();
+  }
+}
+#define Check(OK) CheckImpl((OK), #OK, __FILE__, __LINE__)
+
 int DoTestOneInput(const uint8_t* data, size_t size) {
   JxlDecoderStatus status;
-  JxlDecoder* dec = JxlDecoderCreate(nullptr);
+  TrackingMemoryManager memory_manager{/* cap */ 1 * kGiB,
+                                       /* total_cap */ 5 * kGiB};
+  JxlDecoder* dec = JxlDecoderCreate(memory_manager.get());
+  const auto finish = [&]() -> int {
+    JxlDecoderDestroy(dec);
+    Check(memory_manager.Reset());
+    return 0;
+  };
+
   JxlDecoderSubscribeEvents(dec, JXL_DEC_BASIC_INFO | JXL_DEC_COLOR_ENCODING);
   JxlDecoderSetInput(dec, data, size);
 
   status = JxlDecoderProcessInput(dec);
 
-  if (status != JXL_DEC_BASIC_INFO) {
-    JxlDecoderDestroy(dec);
-    return 0;
-  }
+  if (status != JXL_DEC_BASIC_INFO) return finish();
 
   JxlBasicInfo info;
   status = JxlDecoderGetBasicInfo(dec, &info);
@@ -40,10 +60,7 @@ int DoTestOneInput(const uint8_t* data, size_t size) {
   }
   status = JxlDecoderProcessInput(dec);
 
-  if (status != JXL_DEC_COLOR_ENCODING) {
-    JxlDecoderDestroy(dec);
-    return 0;
-  }
+  if (status != JXL_DEC_COLOR_ENCODING) return finish();
 
   JxlDecoderGetColorAsEncodedProfile(dec, JXL_COLOR_PROFILE_TARGET_ORIGINAL,
                                      nullptr);
@@ -51,8 +68,7 @@ int DoTestOneInput(const uint8_t* data, size_t size) {
   JxlDecoderGetICCProfileSize(dec, JXL_COLOR_PROFILE_TARGET_ORIGINAL,
                               &dec_profile_size);
 
-  JxlDecoderDestroy(dec);
-  return 0;
+  return finish();
 }
 
 }  // namespace

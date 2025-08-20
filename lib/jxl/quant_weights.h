@@ -11,7 +11,6 @@
 #include <array>
 #include <cstdint>
 #include <cstring>
-#include <hwy/aligned_allocator.h>
 #include <vector>
 
 #include "lib/jxl/ac_strategy.h"
@@ -20,6 +19,7 @@
 #include "lib/jxl/base/status.h"
 #include "lib/jxl/dec_bit_reader.h"
 #include "lib/jxl/frame_dimensions.h"
+#include "lib/jxl/memory_manager_internal.h"
 
 namespace jxl {
 
@@ -31,8 +31,8 @@ static constexpr size_t kLog2NumQuantModes = 3;
 struct DctQuantWeightParams {
   static constexpr size_t kLog2MaxDistanceBands = 4;
   static constexpr size_t kMaxDistanceBands = 1 + (1 << kLog2MaxDistanceBands);
-  typedef std::array<std::array<float, kMaxDistanceBands>, 3>
-      DistanceBandsArray;
+  using DistanceBandsArray =
+      std::array<std::array<float, kMaxDistanceBands>, 3>;
 
   size_t num_distance_bands = 0;
   DistanceBandsArray distance_bands = {};
@@ -69,15 +69,15 @@ struct QuantEncodingInternal {
   template <Mode mode>
   struct Tag {};
 
-  typedef std::array<std::array<float, 3>, 3> IdWeights;
-  typedef std::array<std::array<float, 6>, 3> DCT2Weights;
-  typedef std::array<std::array<float, 2>, 3> DCT4Multipliers;
-  typedef std::array<std::array<float, 9>, 3> AFVWeights;
-  typedef std::array<float, 3> DCT4x8Multipliers;
+  using IdWeights = std::array<std::array<float, 3>, 3>;
+  using DCT2Weights = std::array<std::array<float, 6>, 3>;
+  using DCT4Multipliers = std::array<std::array<float, 2>, 3>;
+  using AFVWeights = std::array<std::array<float, 9>, 3>;
+  using DCT4x8Multipliers = std::array<float, 3>;
 
   template <size_t A>
   static constexpr QuantEncodingInternal Library() {
-    static_assert(A < kNumPredefinedTables);
+    static_assert(A < kNumPredefinedTables, "Library index out of bounds");
     return QuantEncodingInternal(Tag<kQuantModeLibrary>(), A);
   }
   constexpr QuantEncodingInternal(Tag<kQuantModeLibrary> /* tag */,
@@ -185,14 +185,8 @@ struct QuantEncodingInternal {
   // Weights for 4x4 sub-block in AFV.
   DctQuantWeightParams dct_params_afv_4x4;
 
-  union {
-    // Which predefined table to use. Only used if mode is kQuantModeLibrary.
-    uint8_t predefined = 0;
-
-    // Which other quant table to copy; must copy from a table that comes before
-    // the current one. Only used if mode is kQuantModeCopy.
-    uint8_t source;
-  };
+  // Which predefined table to use. Only used if mode is kQuantModeLibrary.
+  uint8_t predefined = 0;
 };
 
 class QuantEncoding final : public QuantEncodingInternal {
@@ -359,9 +353,8 @@ class DequantMatrices {
 
   static const QuantEncoding* Library();
 
-  typedef std::array<QuantEncodingInternal,
-                     kNumPredefinedTables * kNumQuantTables>
-      DequantLibraryInternal;
+  using DequantLibraryInternal =
+      std::array<QuantEncodingInternal, kNumPredefinedTables * kNumQuantTables>;
   // Return the array of library kNumPredefinedTables QuantEncoding entries as
   // a constexpr array. Use Library() to obtain a pointer to the copy in the
   // .cc file.
@@ -418,14 +411,14 @@ class DequantMatrices {
   // MUST be equal `sum(dot(required_size_x, required_size_y))`.
   static constexpr size_t kSumRequiredXy = 2056;
 
-  Status EnsureComputed(uint32_t acs_mask);
+  Status EnsureComputed(JxlMemoryManager* memory_manager, uint32_t acs_mask);
 
  private:
   static constexpr size_t kTotalTableSize = kSumRequiredXy * kDCTBlockSize * 3;
 
   uint32_t computed_mask_ = 0;
   // kTotalTableSize entries followed by kTotalTableSize for inv_table
-  hwy::AlignedFreeUniquePtr<float[]> table_storage_;
+  AlignedMemory table_storage_;
   const float* table_;
   const float* inv_table_;
   float dc_quant_[3] = {kDCQuant[0], kDCQuant[1], kDCQuant[2]};

@@ -32,8 +32,6 @@ list(APPEND JPEGXL_INTERNAL_TESTS
   ../tools/gauss_blur_test.cc
 )
 
-find_package(GTest)
-
 set(JXL_WASM_TEST_LINK_FLAGS "")
 if (EMSCRIPTEN)
   # The emscripten linking step takes too much memory and crashes during the
@@ -61,6 +59,7 @@ foreach (TESTFILE IN LISTS JPEGXL_INTERNAL_TESTS)
   get_filename_component(TESTNAME ${TESTFILE} NAME_WE)
   if(TESTFILE STREQUAL ../tools/djxl_fuzzer_test.cc)
     add_executable(${TESTNAME} ${TESTFILE} ../tools/djxl_fuzzer.cc)
+    target_link_libraries(${TESTNAME} jxl_tool)
   else()
     add_executable(${TESTNAME} ${TESTFILE})
   endif()
@@ -76,8 +75,8 @@ foreach (TESTFILE IN LISTS JPEGXL_INTERNAL_TESTS)
     ${JPEGXL_COVERAGE_FLAGS}
   )
   target_link_libraries(${TESTNAME}
-    GTest::GTest
-    GTest::Main
+    gtest
+    gtest_main
     jxl_testlib-internal
     jxl_extras-internal
   )

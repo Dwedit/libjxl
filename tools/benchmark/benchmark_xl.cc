@@ -20,11 +20,11 @@
 #include <numeric>
 #include <string>
 #include <thread>
-#include <unordered_map>
 #include <utility>
 #include <vector>
 
 #include "lib/extras/codec.h"
+#include "lib/extras/codec_in_out.h"
 #include "lib/extras/dec/color_hints.h"
 #include "lib/extras/dec/decode.h"
 #include "lib/extras/enc/apng.h"
@@ -39,7 +39,6 @@
 #include "lib/jxl/base/span.h"
 #include "lib/jxl/base/status.h"
 #include "lib/jxl/butteraugli/butteraugli.h"
-#include "lib/jxl/codec_in_out.h"
 #include "lib/jxl/color_encoding_internal.h"
 #include "lib/jxl/enc_butteraugli_comparator.h"
 #include "lib/jxl/enc_comparator.h"
@@ -47,7 +46,6 @@
 #include "lib/jxl/image_bundle.h"
 #include "lib/jxl/image_ops.h"
 #include "lib/jxl/jpeg/enc_jpeg_data.h"
-#include "lib/jxl/memory_manager_internal.h"
 #include "tools/benchmark/benchmark_args.h"
 #include "tools/benchmark/benchmark_codec.h"
 #include "tools/benchmark/benchmark_file_io.h"
@@ -60,6 +58,7 @@
 #include "tools/speed_stats.h"
 #include "tools/ssimulacra2.h"
 #include "tools/thread_pool_internal.h"
+#include "tools/tracking_memory_manager.h"
 
 namespace jpegxl {
 namespace tools {
@@ -81,73 +80,6 @@ using ::jxl::StatusOr;
 using ::jxl::ThreadPool;
 using ::jxl::extras::PackedPixelFile;
 
-class TrackingMemoryManager {
- public:
-  explicit TrackingMemoryManager(JxlMemoryManager* inner) : inner_(inner) {
-    outer_.opaque = reinterpret_cast<void*>(this);
-    outer_.alloc = &Alloc;
-    outer_.free = &Free;
-  }
-
-  JxlMemoryManager* get() { return &outer_; }
-
-  void PrintStats() const {
-    fprintf(stderr, "Allocations: %" PRIuS " (max bytes in use: %E)\n",
-            static_cast<size_t>(num_allocations_),
-            static_cast<double>(max_bytes_in_use_));
-  }
-
- private:
-  static void* Alloc(void* opaque, size_t size) {
-    if (opaque == nullptr) {
-      JXL_DEBUG_ABORT("Internal logic error");
-      return nullptr;
-    }
-    TrackingMemoryManager* self =
-        reinterpret_cast<TrackingMemoryManager*>(opaque);
-    void* result = self->inner_->alloc(self->inner_->opaque, size);
-    if (result != nullptr) {
-      std::lock_guard<std::mutex> guard(self->mutex_);
-      self->num_allocations_++;
-      self->bytes_in_use_ += size;
-      self->max_bytes_in_use_ =
-          std::max(self->max_bytes_in_use_, self->bytes_in_use_);
-      self->allocations_[result] = size;
-    }
-    return result;
-  }
-
-  static void Free(void* opaque, void* address) {
-    if (opaque == nullptr) {
-      JXL_DEBUG_ABORT("Internal logic error");
-      return;
-    }
-    if (address == nullptr) return;
-    TrackingMemoryManager* self =
-        reinterpret_cast<TrackingMemoryManager*>(opaque);
-    {
-      std::lock_guard<std::mutex> guard(self->mutex_);
-      auto entry = self->allocations_.find(address);
-      if (entry != self->allocations_.end()) {
-        self->num_allocations_--;
-        self->bytes_in_use_ -= entry->second;
-        self->allocations_.erase(entry);
-      } else {
-        JXL_DEBUG_ABORT("Internal logic error");
-      }
-    }
-    self->inner_->free(self->inner_->opaque, address);
-  }
-
-  std::unordered_map<void*, size_t> allocations_;
-  std::mutex mutex_;
-  uint64_t bytes_in_use_ = 0;
-  uint64_t max_bytes_in_use_ = 0;
-  uint64_t num_allocations_ = 0;
-  JxlMemoryManager outer_;
-  JxlMemoryManager* inner_;
-};
-
 Status WriteImage(const Image3F& image, ThreadPool* pool,
                   const std::string& filename) {
   JxlPixelFormat format = {3, JXL_TYPE_UINT8, JXL_BIG_ENDIAN, 0};
@@ -155,19 +87,28 @@ Status WriteImage(const Image3F& image, ThreadPool* pool,
                        jxl::extras::ConvertImage3FToPackedPixelFile(
                            image, ColorEncoding::SRGB(), format, pool));
   std::vector<uint8_t> encoded;
-  return Encode(ppf, filename, &encoded, pool) && WriteFile(filename, encoded);
+  return jxl::Encode(ppf, filename, &encoded, pool) &&
+         WriteFile(filename, encoded);
+}
+
+void PrintStats(const TrackingMemoryManager& memory_manager) {
+  fprintf(stderr,
+          "Allocation count: %" PRIuS ", total: %E (max bytes in use: %E)\n",
+          static_cast<size_t>(memory_manager.total_allocations),
+          static_cast<double>(memory_manager.total_bytes_allocated),
+          static_cast<double>(memory_manager.max_bytes_in_use));
 }
 
 Status ReadPNG(const std::string& filename, Image3F* image) {
   JxlMemoryManager* memory_manager = jpegxl::tools::NoMemoryManager();
-  CodecInOut io{memory_manager};
+  auto io = jxl::make_unique<CodecInOut>(memory_manager);
   std::vector<uint8_t> encoded;
   JXL_RETURN_IF_ERROR(ReadFile(filename, &encoded));
   JXL_RETURN_IF_ERROR(
-      jxl::SetFromBytes(jxl::Bytes(encoded), jxl::extras::ColorHints(), &io));
-  JXL_ASSIGN_OR_RETURN(*image,
-                       Image3F::Create(memory_manager, io.xsize(), io.ysize()));
-  JXL_RETURN_IF_ERROR(CopyImageTo(*io.Main().color(), image));
+      jxl::SetFromBytes(Bytes(encoded), jxl::extras::ColorHints(), io.get()));
+  JXL_ASSIGN_OR_RETURN(
+      *image, Image3F::Create(memory_manager, io->xsize(), io->ysize()));
+  JXL_RETURN_IF_ERROR(CopyImageTo(*io->Main().color(), image));
   return true;
 }
 
@@ -317,21 +258,24 @@ Status DoCompress(const std::string& filename, const PackedPixelFile& ppf,
   float distance = 1.0f;
 
   if (valid && !skip_butteraugli) {
-    CodecInOut ppf_io{memory_manager};
+    auto ppf_io = jxl::make_unique<CodecInOut>(memory_manager);
     JXL_RETURN_IF_ERROR(
-        ConvertPackedPixelFileToCodecInOut(ppf, inner_pool, &ppf_io));
-    CodecInOut ppf2_io{memory_manager};
+        ConvertPackedPixelFileToCodecInOut(ppf, inner_pool, ppf_io.get()));
+    auto ppf2_io = jxl::make_unique<CodecInOut>(memory_manager);
     JXL_RETURN_IF_ERROR(
-        ConvertPackedPixelFileToCodecInOut(ppf2, inner_pool, &ppf2_io));
-    const ImageBundle& ib1 = ppf_io.Main();
-    const ImageBundle& ib2 = ppf2_io.Main();
+        ConvertPackedPixelFileToCodecInOut(ppf2, inner_pool, ppf2_io.get()));
+    const ImageBundle& ib1 = ppf_io->Main();
+    const ImageBundle& ib2 = ppf2_io->Main();
     if (jxl::SameSize(ppf, ppf2)) {
       ButteraugliParams params;
-      // Hack the default intensity target value to be 80.0, the intensity
-      // target of sRGB images and a more reasonable viewing default than
-      // JPEG XL file format's default.
+      // Hack the default intensity target value for SDR images to be 80.0, the
+      // intensity target of sRGB images and a more reasonable viewing default
+      // than JPEG XL file format's default.
       // TODO(szabadka) Support different intensity targets as well.
-      params.intensity_target = 80.0;
+      const auto& transfer_function = ib1.c_current().Tf();
+      params.intensity_target = transfer_function.IsPQ()    ? 10000.f
+                                : transfer_function.IsHLG() ? 1000.f
+                                                            : 80.f;
 
       const JxlCmsInterface& cms = *JxlGetDefaultCms();
       JxlButteraugliComparator comparator(params, cms);
@@ -349,8 +293,9 @@ Status DoCompress(const std::string& filename, const PackedPixelFile& ppf,
         compressed->empty()
             ? 0
             : jxl::ComputePSNR(ib1, ib2, *JxlGetDefaultCms()) * input_pixels;
-    double pnorm =
-        ComputeDistanceP(distmap, ButteraugliParams(), Args()->error_pnorm);
+    JXL_ASSIGN_OR_RETURN(
+        double pnorm,
+        ComputeDistanceP(distmap, ButteraugliParams(), Args()->error_pnorm));
     s->distance_p_norm += pnorm * input_pixels;
     JXL_ASSIGN_OR_RETURN(Msssim msssim, ComputeSSIMULACRA2(ib1, ib2));
     double ssimulacra2 = msssim.Score();
@@ -889,10 +834,7 @@ class Benchmark {
  public:
   // Return the exit code of the program.
   static Status Run() {
-    JxlMemoryManager default_memory_manager;
-    JXL_RETURN_IF_ERROR(
-        jxl::MemoryManagerInit(&default_memory_manager, nullptr));
-    TrackingMemoryManager memory_manager(&default_memory_manager);
+    TrackingMemoryManager memory_manager{};
     bool ok = true;
     {
       const StringVec methods = GetMethods();
@@ -924,7 +866,7 @@ class Benchmark {
       }
     }
 
-    memory_manager.PrintStats();
+    PrintStats(memory_manager);
     if (!ok) return JXL_FAILURE("RunTasks error");
     return true;
   }
@@ -1075,9 +1017,9 @@ class Benchmark {
           memcpy(row_out, &row_in[x0], size * sizeof(row_out[0]));
         }
       }
-      std::string fn_output =
-          StringPrintf("%s/%s.crop_%dx%d+%d+%d.png", sample_tmp_dir.c_str(),
-                       FileBaseName(fnames[idx]).c_str(), size, size, x0, y0);
+      std::string fn_output = StringPrintf(
+          "%s/%s.crop_%" PRIuS "x%" PRIuS "+%d+%d.png", sample_tmp_dir.c_str(),
+          FileBaseName(fnames[idx]).c_str(), size, size, x0, y0);
       ThreadPool* null_pool = nullptr;
       JPEGXL_TOOLS_CHECK(WriteImage(sample, null_pool, fn_output));
       fnames_out.push_back(fn_output);

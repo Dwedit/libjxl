@@ -7,6 +7,7 @@
 
 #include "tools/benchmark/benchmark_utils.h"
 
+#include <cstdlib>
 #include <string>
 #include <vector>
 
@@ -24,10 +25,14 @@
 #include <unistd.h>
 
 #include <cstdio>
-#include <cstdlib>
 #include <utility>
 
+#ifdef __APPLE__
+#include <crt_externs.h>
+#define environ (*_NSGetEnviron())
+#else
 extern char** environ;  // NOLINT
+#endif
 
 namespace jpegxl {
 namespace tools {

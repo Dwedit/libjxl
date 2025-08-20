@@ -5,39 +5,29 @@
 
 #include <jxl/memory_manager.h>
 
-#include "lib/jxl/base/status.h"
-
-// Suppress any -Wdeprecated-declarations warning that might be emitted by
-// GCC or Clang by std::stable_sort in C++17 or later mode
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-#elif defined(__GNUC__)
-#pragma GCC push_options
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-
 #include <algorithm>
-
-#ifdef __clang__
-#pragma clang diagnostic pop
-#elif defined(__GNUC__)
-#pragma GCC pop_options
-#endif
-
 #include <cmath>
+#include <cstddef>
 #include <cstdint>
-#include <hwy/aligned_allocator.h>
+#include <cstring>
+#include <limits>
+#include <utility>
 #include <vector>
 
 #include "lib/jxl/ac_strategy.h"
+#include "lib/jxl/base/compiler_specific.h"
 #include "lib/jxl/base/rect.h"
+#include "lib/jxl/base/status.h"
 #include "lib/jxl/coeff_order.h"
 #include "lib/jxl/coeff_order_fwd.h"
+#include "lib/jxl/common.h"
 #include "lib/jxl/dct_util.h"
 #include "lib/jxl/enc_ans.h"
+#include "lib/jxl/enc_ans_params.h"
 #include "lib/jxl/enc_bit_writer.h"
+#include "lib/jxl/frame_dimensions.h"
 #include "lib/jxl/lehmer_code.h"
+#include "lib/jxl/memory_manager_internal.h"
 
 namespace jxl {
 
@@ -73,14 +63,15 @@ std::pair<uint32_t, uint32_t> ComputeUsedOrders(
   return {ret, ret_customize};
 }
 
-Status ComputeCoeffOrder(SpeedTier speed, const ACImage& acs,
+Status ComputeCoeffOrder(SpeedTier speed, const ACImage& ac_image,
                          const AcStrategyImage& ac_strategy,
                          const FrameDimensions& frame_dim,
                          uint32_t& all_used_orders, uint32_t prev_used_acs,
                          uint32_t current_used_acs,
                          uint32_t current_used_orders,
                          coeff_order_t* JXL_RESTRICT order) {
-  std::vector<int32_t> num_zeros(kCoeffOrderMaxSize);
+  JxlMemoryManager* memory_manager = ac_strategy.memory_manager();
+  std::vector<int64_t> num_zeros(kCoeffOrderMaxSize);
   // If compressing at high speed and only using 8x8 DCTs, only consider a
   // subset of blocks.
   double block_fraction = 1.0f;
@@ -118,9 +109,9 @@ Status ComputeCoeffOrder(SpeedTier speed, const ACImage& acs,
                       kGroupDimInBlocks, kGroupDimInBlocks,
                       frame_dim.xsize_blocks, frame_dim.ysize_blocks);
       ConstACPtr rows[3];
-      ACType type = acs.Type();
+      ACType type = ac_image.Type();
       for (size_t c = 0; c < 3; c++) {
-        rows[c] = acs.PlaneRow(c, group_index, 0);
+        rows[c] = ac_image.PlaneRow(c, group_index, 0);
       }
       size_t ac_offset = 0;
 
@@ -163,9 +154,12 @@ Status ComputeCoeffOrder(SpeedTier speed, const ACImage& acs,
   }
   struct PosAndCount {
     uint32_t pos;
-    uint32_t count;
+    // Saving index breaks the ties for non-stable sort
+    uint64_t count_and_idx;
   };
-  auto mem = hwy::AllocateAligned<PosAndCount>(AcStrategy::kMaxCoeffArea);
+  size_t mem_bytes = AcStrategy::kMaxCoeffArea * sizeof(PosAndCount);
+  JXL_ASSIGN_OR_RETURN(auto mem,
+                       AlignedMemory::Create(memory_manager, mem_bytes));
 
   std::vector<coeff_order_t> natural_order_buffer;
 
@@ -176,6 +170,8 @@ Status ComputeCoeffOrder(SpeedTier speed, const ACImage& acs,
     computed |= 1 << ord;
     AcStrategy acs = AcStrategy::FromRawStrategy(o);
     size_t sz = kDCTBlockSize * acs.covered_blocks_x() * acs.covered_blocks_y();
+    // Expected maximal size is 256 x 256.
+    JXL_DASSERT(sz <= (1 << 16));
 
     // Do nothing for transforms that don't appear.
     if ((1 << ord) & ~current_used_acs) continue;
@@ -202,7 +198,7 @@ Status ComputeCoeffOrder(SpeedTier speed, const ACImage& acs,
     bool is_nondefault = false;
     for (uint8_t c = 0; c < 3; c++) {
       // Apply zig-zag order.
-      PosAndCount* pos_and_val = mem.get();
+      PosAndCount* pos_and_val = mem.address<PosAndCount>();
       size_t offset = CoeffOrderOffset(ord, c);
       JXL_ENSURE(CoeffOrderOffset(ord, c + 1) - offset == sz);
       float inv_sqrt_sz = 1.0f / std::sqrt(sz);
@@ -211,15 +207,20 @@ Status ComputeCoeffOrder(SpeedTier speed, const ACImage& acs,
         pos_and_val[i].pos = pos;
         // We don't care for the exact number -> quantize number of zeros,
         // to get less permuted order.
-        pos_and_val[i].count = num_zeros[offset + pos] * inv_sqrt_sz + 0.1f;
+        uint64_t count = num_zeros[offset + pos] * inv_sqrt_sz + 0.1f;
+        // Worst case: all dct8x8, all zeroes: count <= nb_pixels/64/8
+        // nb_pixels is limited to 2^40 (Level 10 limit)
+        // so count is limited to 2^31
+        JXL_DASSERT(count < (uint64_t{1} << 48));
+        pos_and_val[i].count_and_idx = (count << 16) | i;
       }
 
       // Stable-sort -> elements with same number of zeros will preserve their
       // order.
       auto comparator = [](const PosAndCount& a, const PosAndCount& b) -> bool {
-        return a.count < b.count;
+        return a.count_and_idx < b.count_and_idx;
       };
-      std::stable_sort(pos_and_val, pos_and_val + sz, comparator);
+      std::sort(pos_and_val, pos_and_val + sz, comparator);
 
       // Grab indices.
       for (size_t i = 0; i < sz; ++i) {
@@ -264,15 +265,13 @@ Status EncodePermutation(const coeff_order_t* JXL_RESTRICT order, size_t skip,
   JxlMemoryManager* memory_manager = writer->memory_manager();
   std::vector<std::vector<Token>> tokens(1);
   JXL_RETURN_IF_ERROR(TokenizePermutation(order, skip, size, tokens.data()));
-  std::vector<uint8_t> context_map;
   EntropyEncodingData codes;
   JXL_ASSIGN_OR_RETURN(
-      size_t cost, BuildAndEncodeHistograms(
-                       memory_manager, HistogramParams(), kPermutationContexts,
-                       tokens, &codes, &context_map, writer, layer, aux_out));
+      size_t cost, BuildAndEncodeHistograms(memory_manager, HistogramParams(),
+                                            kPermutationContexts, tokens,
+                                            &codes, writer, layer, aux_out));
   (void)cost;
-  JXL_RETURN_IF_ERROR(
-      WriteTokens(tokens[0], codes, context_map, 0, writer, layer, aux_out));
+  JXL_RETURN_IF_ERROR(WriteTokens(tokens[0], codes, 0, writer, layer, aux_out));
   return true;
 }
 
@@ -295,7 +294,9 @@ Status EncodeCoeffOrders(uint16_t used_orders,
                          BitWriter* writer, LayerType layer,
                          AuxOut* JXL_RESTRICT aux_out) {
   JxlMemoryManager* memory_manager = writer->memory_manager();
-  auto mem = hwy::AllocateAligned<coeff_order_t>(AcStrategy::kMaxCoeffArea);
+  size_t mem_bytes = AcStrategy::kMaxCoeffArea * sizeof(coeff_order_t);
+  JXL_ASSIGN_OR_RETURN(auto mem,
+                       AlignedMemory::Create(memory_manager, mem_bytes));
   uint16_t computed = 0;
   std::vector<std::vector<Token>> tokens(1);
   std::vector<coeff_order_t> natural_order_lut;
@@ -310,23 +311,21 @@ Status EncodeCoeffOrders(uint16_t used_orders,
     if (natural_order_lut.size() < size) natural_order_lut.resize(size);
     acs.ComputeNaturalCoeffOrderLut(natural_order_lut.data());
     for (size_t c = 0; c < 3; c++) {
-      JXL_RETURN_IF_ERROR(EncodeCoeffOrder(&order[CoeffOrderOffset(ord, c)],
-                                           acs, tokens.data(), mem.get(),
-                                           natural_order_lut));
+      JXL_RETURN_IF_ERROR(
+          EncodeCoeffOrder(&order[CoeffOrderOffset(ord, c)], acs, tokens.data(),
+                           mem.address<coeff_order_t>(), natural_order_lut));
     }
   }
   // Do not write anything if no order is used.
   if (used_orders != 0) {
-    std::vector<uint8_t> context_map;
     EntropyEncodingData codes;
     JXL_ASSIGN_OR_RETURN(
-        size_t cost,
-        BuildAndEncodeHistograms(memory_manager, HistogramParams(),
-                                 kPermutationContexts, tokens, &codes,
-                                 &context_map, writer, layer, aux_out));
+        size_t cost, BuildAndEncodeHistograms(memory_manager, HistogramParams(),
+                                              kPermutationContexts, tokens,
+                                              &codes, writer, layer, aux_out));
     (void)cost;
     JXL_RETURN_IF_ERROR(
-        WriteTokens(tokens[0], codes, context_map, 0, writer, layer, aux_out));
+        WriteTokens(tokens[0], codes, 0, writer, layer, aux_out));
   }
   return true;
 }

@@ -8,12 +8,26 @@
 #include <jxl/memory_manager.h>
 
 #include <algorithm>
+#include <cstddef>
+#include <cstdint>
+#include <utility>
 
 #include "lib/jxl/ac_strategy.h"
+#include "lib/jxl/base/bits.h"
+#include "lib/jxl/base/data_parallel.h"
 #include "lib/jxl/base/status.h"
 #include "lib/jxl/blending.h"
 #include "lib/jxl/coeff_order.h"
+#include "lib/jxl/color_encoding_internal.h"
 #include "lib/jxl/common.h"  // JXL_HIGH_PRECISION
+#include "lib/jxl/frame_dimensions.h"
+#include "lib/jxl/frame_header.h"
+#include "lib/jxl/image.h"
+#include "lib/jxl/image_bundle.h"
+#include "lib/jxl/image_metadata.h"
+#include "lib/jxl/loop_filter.h"
+#include "lib/jxl/memory_manager_internal.h"
+#include "lib/jxl/render_pipeline/render_pipeline.h"
 #include "lib/jxl/render_pipeline/stage_blending.h"
 #include "lib/jxl/render_pipeline/stage_chroma_upsampling.h"
 #include "lib/jxl/render_pipeline/stage_cms.h"
@@ -60,16 +74,25 @@ Status GroupDecCache::InitOnce(JxlMemoryManager* memory_manager,
     max_block_area_ = max_block_area;
     // We need 3x float blocks for dequantized coefficients and 1x for scratch
     // space for transforms.
-    float_memory_ = hwy::AllocateAligned<float>(max_block_area_ * 7);
+    JXL_ASSIGN_OR_RETURN(
+        float_memory_,
+        AlignedMemory::Create(memory_manager,
+                              max_block_area_ * 7 * sizeof(float)));
     // We need 3x int32 or int16 blocks for quantized coefficients.
-    int32_memory_ = hwy::AllocateAligned<int32_t>(max_block_area_ * 3);
-    int16_memory_ = hwy::AllocateAligned<int16_t>(max_block_area_ * 3);
+    JXL_ASSIGN_OR_RETURN(
+        int32_memory_,
+        AlignedMemory::Create(memory_manager,
+                              max_block_area_ * 3 * sizeof(int32_t)));
+    JXL_ASSIGN_OR_RETURN(
+        int16_memory_,
+        AlignedMemory::Create(memory_manager,
+                              max_block_area_ * 3 * sizeof(int16_t)));
   }
 
-  dec_group_block = float_memory_.get();
+  dec_group_block = float_memory_.address<float>();
   scratch_space = dec_group_block + max_block_area_ * 3;
-  dec_group_qblock = int32_memory_.get();
-  dec_group_qblock16 = int16_memory_.get();
+  dec_group_qblock = int32_memory_.address<int32_t>();
+  dec_group_qblock16 = int16_memory_.address<int16_t>();
   return true;
 }
 
@@ -159,7 +182,8 @@ Status PassesDecoderState::PreparePipeline(const FrameHeader& frame_header,
          ec++) {
       if (frame_header.extra_channel_upsampling[ec] != 1) {
         JXL_RETURN_IF_ERROR(builder.AddStage(GetUpsamplingStage(
-            frame_header.nonserialized_metadata->transform_data, 3 + ec,
+            memory_manager, frame_header.nonserialized_metadata->transform_data,
+            3 + ec,
             CeilLog2Nonzero(frame_header.extra_channel_upsampling[ec]))));
       }
     }
@@ -181,8 +205,8 @@ Status PassesDecoderState::PreparePipeline(const FrameHeader& frame_header,
         (late_ec_upsample ? frame_header.extra_channel_upsampling.size() : 0);
     for (size_t c = 0; c < nb_channels; c++) {
       JXL_RETURN_IF_ERROR(builder.AddStage(GetUpsamplingStage(
-          frame_header.nonserialized_metadata->transform_data, c,
-          CeilLog2Nonzero(frame_header.upsampling))));
+          memory_manager, frame_header.nonserialized_metadata->transform_data,
+          c, CeilLog2Nonzero(frame_header.upsampling))));
     }
   }
   if (render_noise) {
@@ -320,6 +344,11 @@ Status PassesDecoderState::PreparePipeline(const FrameHeader& frame_header,
         }
       }
       linear = false;
+    } else {
+      auto cms_stage = GetCmsStage(output_encoding_info, false);
+      if (cms_stage) {
+        JXL_RETURN_IF_ERROR(builder.AddStage(std::move(cms_stage)));
+      }
     }
     (void)linear;
 

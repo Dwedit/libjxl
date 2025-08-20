@@ -116,9 +116,12 @@ inline bool ParseEffort(const std::string& s, int* out) {
   } else if (s == "glacier") {
     *out = 10;
     return true;
+  } else if (s == "tectonic_plate") {
+    *out = 11;
+    return true;
   }
   size_t st = static_cast<size_t>(strtoull(s.c_str(), nullptr, 0));
-  if (st <= 10 && st >= 1) {
+  if (st <= 11 && st >= 1) {
     *out = st;
     return true;
   }
@@ -254,6 +257,8 @@ class JxlCodec : public ImageCodec {
     } else if (param == "noperc") {
       cparams_.AddOption(JXL_ENC_FRAME_SETTING_DISABLE_PERCEPTUAL_HEURISTICS,
                          1);
+    } else if (param == "expert") {
+      cparams_.allow_expert_options = true;
     } else {
       return JXL_FAILURE("Unrecognized param");
     }
@@ -305,7 +310,7 @@ class JxlCodec : public ImageCodec {
     dparams_.runner = pool->runner();
     dparams_.runner_opaque = pool->runner_opaque();
     dparams_.memory_manager = memory_manager_;
-    JxlDataType data_type = uint8_ ? JXL_TYPE_UINT8 : JXL_TYPE_UINT16;
+    JxlDataType data_type = uint8_ ? JXL_TYPE_UINT8 : JXL_TYPE_FLOAT;
     for (uint32_t c = 1; c <= 4; ++c) {
       dparams_.accepted_formats.push_back({c, data_type, JXL_LITTLE_ENDIAN, 0});
     }
@@ -341,7 +346,7 @@ class JxlCodec : public ImageCodec {
  private:
   struct DebugTicket {
     std::string debug_prefix;
-    std::atomic<bool> has_error{false};
+    std::atomic<uint32_t> has_error{0};
   };
 
   static void DebugCallback(void* opaque, const char* label, size_t xsize,
@@ -350,7 +355,7 @@ class JxlCodec : public ImageCodec {
     DebugTicket* ticket = reinterpret_cast<DebugTicket*>(opaque);
     if (ticket->has_error) return;
     if (!DebugCallbackImpl(ticket, label, xsize, ysize, color, pixels)) {
-      ticket->has_error = true;
+      ticket->has_error = 1;
     }
   }
 

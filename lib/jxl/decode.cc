@@ -3,12 +3,21 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+#include <jxl/cms_interface.h>
+#include <jxl/codestream_header.h>
+#include <jxl/color_encoding.h>
 #include <jxl/decode.h>
+#include <jxl/jxl_export.h>
+#include <jxl/memory_manager.h>
+#include <jxl/parallel_runner.h>
 #include <jxl/types.h>
 #include <jxl/version.h>
 
 #include <algorithm>
 #include <array>
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
 #include <functional>
 #include <memory>
 #include <utility>
@@ -17,12 +26,17 @@
 #include "lib/jxl/base/byte_order.h"
 #include "lib/jxl/base/common.h"
 #include "lib/jxl/base/compiler_specific.h"
+#include "lib/jxl/base/data_parallel.h"
 #include "lib/jxl/base/span.h"
 #include "lib/jxl/base/status.h"
+#include "lib/jxl/color_encoding_internal.h"
+#include "lib/jxl/dec_bit_reader.h"
+#include "lib/jxl/dec_cache.h"
+#include "lib/jxl/image_metadata.h"
+#include "lib/jxl/jpeg/jpeg_data.h"
 #include "lib/jxl/padded_bytes.h"
 
 // JPEGXL_ENABLE_BOXES, JPEGXL_ENABLE_TRANSCODE_JPEG
-#include "lib/jxl/common.h"
 
 #if JPEGXL_ENABLE_BOXES || JPEGXL_ENABLE_TRANSCODE_JPEG
 #include "lib/jxl/box_content_decoder.h"
@@ -211,10 +225,10 @@ enum class JpegReconStage : uint32_t {
 // For each internal frame, which storage locations it references, and which
 // storage locations it is stored in, using the bit mask as defined in
 // FrameDecoder::References and FrameDecoder::SaveAs.
-typedef struct FrameRef {
+struct FrameRef {
   int reference;
   int saved_as;
-} FrameRef;
+};
 
 /*
 Given list of frame references to storage slots, and storage slots in which this
@@ -302,7 +316,7 @@ struct ExtraChannelOutput {
 
 namespace jxl {
 
-typedef struct JxlDecoderFrameIndexBoxEntryStruct {
+struct JxlDecoderFrameIndexBoxEntry {
   // OFFi: offset of start byte of this frame compared to start
   // byte of previous frame from this index in the JPEG XL codestream. For the
   // first frame, this is the offset from the first byte of the JPEG XL
@@ -321,9 +335,9 @@ typedef struct JxlDecoderFrameIndexBoxEntryStruct {
   // other frames, such as frames that aren't the last frame with a duration of
   // 0 ticks.
   uint32_t Fi;
-} JxlDecoderFrameIndexBoxEntry;
+};
 
-typedef struct JxlDecoderFrameIndexBoxStruct {
+struct JxlDecoderFrameIndexBox {
   int64_t NF() const { return entries.size(); }
   int32_t TNUM = 1;
   int32_t TDEN = 1000;
@@ -340,13 +354,13 @@ typedef struct JxlDecoderFrameIndexBoxStruct {
     e.Fi = Fi;
     entries.push_back(e);
   }
-} JxlDecoderFrameIndexBox;
+};
 
 }  // namespace jxl
 
 // NOLINTNEXTLINE(clang-analyzer-optin.performance.Padding)
-struct JxlDecoderStruct {
-  JxlDecoderStruct() = default;
+struct JxlDecoder {
+  JxlDecoder() = default;
 
   JxlMemoryManager memory_manager;
   std::unique_ptr<jxl::ThreadPool> thread_pool;
@@ -652,29 +666,16 @@ struct JxlDecoderStruct {
     // processed, so this check works.
     return stage != DecoderStage::kCodestreamFinished;
   }
-
-  // If set then some operations will fail, if those would require
-  // allocating large objects. Actual memory usage might be two orders of
-  // magnitude bigger.
-  // TODO(eustas): remove once there is working API for memory / CPU limit.
-  size_t memory_limit_base = 0;
-  size_t cpu_limit_base = 0;
-  size_t used_cpu_base = 0;
 };
 
 namespace {
 
 bool CheckSizeLimit(JxlDecoder* dec, size_t xsize, size_t ysize) {
-  if (!dec->memory_limit_base) return true;
   if (xsize == 0 || ysize == 0) return true;
-  if (xsize >= dec->memory_limit_base || ysize >= dec->memory_limit_base) {
-    return false;
-  }
-  // Rough estimate of real row length.
-  xsize = jxl::DivCeil(xsize, 32) * 32;
-  size_t num_pixels = xsize * ysize;
-  if (num_pixels / xsize != ysize) return false;  // overflow
-  if (num_pixels > dec->memory_limit_base) return false;
+  size_t padded_xsize = jxl::DivCeil(xsize, 32) * 32;
+  if (padded_xsize < xsize) return false;  // overflow
+  size_t num_pixels = padded_xsize * ysize;
+  if (num_pixels / padded_xsize != ysize) return false;  // overflow
   return true;
 }
 
@@ -793,16 +794,6 @@ JxlDecoder* JxlDecoderCreate(const JxlMemoryManager* memory_manager) {
   // Placement new constructor on allocated memory
   JxlDecoder* dec = new (alloc) JxlDecoder();
   dec->memory_manager = local_memory_manager;
-
-#ifdef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
-  if (!memory_manager) {
-    dec->memory_limit_base = 53 << 16;
-    // Allow 5 x max_image_size processing units; every frame is accounted
-    // as W x H CPU processing units, so there could be numerous small frames
-    // or few larger ones.
-    dec->cpu_limit_base = 5 * dec->memory_limit_base;
-  }
-#endif
 
   JxlDecoderReset(dec);
 
@@ -1050,8 +1041,7 @@ JxlDecoderStatus JxlDecoderReadAllHeaders(JxlDecoder* dec) {
   reader->SkipBits(dec->codestream_bits_ahead);
 
   if (dec->metadata.m.color_encoding.WantICC()) {
-    jxl::Status status =
-        dec->icc_reader->Init(reader.get(), dec->memory_limit_base);
+    jxl::Status status = dec->icc_reader->Init(reader.get());
     // Always check AllReadsWithinBounds, not all the C++ decoder implementation
     // handles reader out of bounds correctly  yet (e.g. context map). Not
     // checking AllReadsWithinBounds can cause reader->Close() to trigger an
@@ -1151,10 +1141,10 @@ JxlDecoderStatus JxlDecoderProcessSections(JxlDecoder* dec) {
     return JXL_INPUT_ERROR("frame processing failed");
   }
   for (size_t i = 0; i < section_status.size(); ++i) {
-    auto status = section_status[i];
-    if (status == jxl::FrameDecoder::kDone) {
+    auto s_status = section_status[i];
+    if (s_status == jxl::FrameDecoder::kDone) {
       dec->section_processed[section_info[i].index] = 1;
-    } else if (status != jxl::FrameDecoder::kSkipped) {
+    } else if (s_status != jxl::FrameDecoder::kSkipped) {
       return JXL_INPUT_ERROR("unexpected section status");
     }
   }
@@ -1279,17 +1269,6 @@ JxlDecoderStatus JxlDecoderProcessCodestream(JxlDecoder* dec) {
       bool output_needed = ((dec->events_wanted & output_type) != 0);
       if (output_needed) {
         JXL_API_RETURN_IF_ERROR(dec->frame_dec->InitFrameOutput());
-      }
-      if (dec->cpu_limit_base != 0) {
-        // No overflow, checked in CheckSizeLimit.
-        size_t num_pixels = frame_dim.xsize * frame_dim.ysize;
-        if (dec->used_cpu_base + num_pixels < dec->used_cpu_base) {
-          return JXL_INPUT_ERROR("image too large");
-        }
-        dec->used_cpu_base += num_pixels;
-        if (dec->used_cpu_base > dec->cpu_limit_base) {
-          return JXL_INPUT_ERROR("image too large");
-        }
       }
       dec->remaining_frame_size = dec->frame_dec->SumSectionSizes();
 
@@ -2694,12 +2673,27 @@ JxlDecoderStatus JxlDecoderSetOutputColorProfile(
   if (dec->post_headers) {
     return JXL_API_ERROR("too late to set the color encoding");
   }
+  auto& output_encoding = dec->passes_state->output_encoding_info;
+  auto& orig_encoding = dec->image_metadata.color_encoding;
+  jxl::ColorEncoding c_out;
+  bool same_encoding = false;
+  if (color_encoding) {
+    JXL_API_RETURN_IF_ERROR(c_out.FromExternal(*color_encoding));
+    same_encoding = c_out.SameColorEncoding(output_encoding.color_encoding);
+  }
   if ((!dec->passes_state->output_encoding_info.cms_set) &&
-      (icc_data != nullptr)) {
+      (icc_data != nullptr ||
+      (!dec->image_metadata.xyb_encoded && !same_encoding))) {
     return JXL_API_ERROR(
         "must set color management system via JxlDecoderSetCms");
   }
-  auto& output_encoding = dec->passes_state->output_encoding_info;
+  if (!orig_encoding.HaveFields() &&
+      dec->passes_state->output_encoding_info.cms_set) {
+    std::vector<uint8_t> tmp_icc = orig_encoding.ICC();
+    JXL_API_RETURN_IF_ERROR(orig_encoding.SetICC(
+        std::move(tmp_icc), &output_encoding.color_management_system));
+    output_encoding.orig_color_encoding = orig_encoding;
+  }
   if (color_encoding) {
     if (dec->image_metadata.color_encoding.IsGray() &&
         color_encoding->color_space != JXL_COLOR_SPACE_GRAY &&
@@ -2709,13 +2703,9 @@ JxlDecoderStatus JxlDecoderSetOutputColorProfile(
     if (color_encoding->color_space == JXL_COLOR_SPACE_UNKNOWN) {
       return JXL_API_ERROR("Unknown output colorspace");
     }
-    jxl::ColorEncoding c_out;
-    JXL_API_RETURN_IF_ERROR(c_out.FromExternal(*color_encoding));
     JXL_API_RETURN_IF_ERROR(!c_out.ICC().empty());
-    if (!c_out.SameColorEncoding(output_encoding.color_encoding)) {
-      JXL_API_RETURN_IF_ERROR(output_encoding.MaybeSetColorEncoding(c_out));
-      dec->image_metadata.color_encoding = output_encoding.color_encoding;
-    }
+    JXL_API_RETURN_IF_ERROR(output_encoding.MaybeSetColorEncoding(c_out));
+    dec->image_metadata.color_encoding = output_encoding.color_encoding;
     return JXL_DEC_SUCCESS;
   }
   // icc_data != nullptr

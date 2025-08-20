@@ -6,6 +6,8 @@
 #include <jxl/thread_parallel_runner.h>
 #include <jxl/thread_parallel_runner_cxx.h>
 
+#include <cstddef>
+#include <cstdint>
 #include <fstream>
 #include <iostream>
 #include <iterator>
@@ -18,7 +20,7 @@ void ProcessInput(const char* filename) {
   std::vector<char> contents((std::istreambuf_iterator<char>(ifs)),
                              std::istreambuf_iterator<char>());
   ifs.close();
-  std::cout << "Processing " << filename << "\n" << std::flush;
+  std::cout << "Processing " << filename << "\n";
   LLVMFuzzerTestOneInput(reinterpret_cast<uint8_t*>(contents.data()),
                          contents.size());
 }

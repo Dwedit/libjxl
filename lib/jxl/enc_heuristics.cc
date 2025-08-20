@@ -9,6 +9,8 @@
 #include <jxl/memory_manager.h>
 
 #include <algorithm>
+#include <array>
+#include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
@@ -31,7 +33,10 @@
 #include "lib/jxl/chroma_from_luma.h"
 #include "lib/jxl/coeff_order.h"
 #include "lib/jxl/coeff_order_fwd.h"
+#include "lib/jxl/color_encoding_internal.h"
 #include "lib/jxl/common.h"
+#include "lib/jxl/dct_util.h"
+#include "lib/jxl/dec_cache.h"
 #include "lib/jxl/dec_group.h"
 #include "lib/jxl/dec_noise.h"
 #include "lib/jxl/dec_xyb.h"
@@ -52,8 +57,10 @@
 #include "lib/jxl/image.h"
 #include "lib/jxl/image_metadata.h"
 #include "lib/jxl/image_ops.h"
+#include "lib/jxl/memory_manager_internal.h"
 #include "lib/jxl/passes_state.h"
 #include "lib/jxl/quant_weights.h"
+#include "lib/jxl/render_pipeline/render_pipeline.h"
 
 namespace jxl {
 
@@ -781,20 +788,21 @@ StatusOr<Image3F> ReconstructImage(
                           FrameHeader::kSplines);
   frame_header.color_transform = ColorTransform::kNone;
 
-  CodecMetadata metadata = *frame_header.nonserialized_metadata;
-  metadata.m.extra_channel_info.clear();
-  metadata.m.num_extra_channels = metadata.m.extra_channel_info.size();
-  frame_header.nonserialized_metadata = &metadata;
+  auto metadata = jxl::make_unique<CodecMetadata>();
+  *metadata = *frame_header.nonserialized_metadata;
+  metadata->m.extra_channel_info.clear();
+  metadata->m.num_extra_channels = metadata->m.extra_channel_info.size();
+  frame_header.nonserialized_metadata = metadata.get();
   frame_header.extra_channel_upsampling.clear();
 
   const bool is_gray = shared.metadata->m.color_encoding.IsGray();
-  PassesDecoderState dec_state(memory_manager);
+  auto dec_state = jxl::make_unique<PassesDecoderState>(memory_manager);
   JXL_RETURN_IF_ERROR(
-      dec_state.output_encoding_info.SetFromMetadata(*shared.metadata));
-  JXL_RETURN_IF_ERROR(dec_state.output_encoding_info.MaybeSetColorEncoding(
+      dec_state->output_encoding_info.SetFromMetadata(*shared.metadata));
+  JXL_RETURN_IF_ERROR(dec_state->output_encoding_info.MaybeSetColorEncoding(
       ColorEncoding::LinearSRGB(is_gray)));
-  dec_state.shared = &shared;
-  JXL_RETURN_IF_ERROR(dec_state.Init(frame_header));
+  dec_state->shared = &shared;
+  JXL_RETURN_IF_ERROR(dec_state->Init(frame_header));
 
   ImageBundle decoded(memory_manager, &shared.metadata->m);
   decoded.origin = frame_header.frame_origin;
@@ -802,7 +810,7 @@ StatusOr<Image3F> ReconstructImage(
       Image3F tmp,
       Image3F::Create(memory_manager, frame_dim.xsize, frame_dim.ysize));
   JXL_RETURN_IF_ERROR(decoded.SetFromImage(
-      std::move(tmp), dec_state.output_encoding_info.color_encoding));
+      std::move(tmp), dec_state->output_encoding_info.color_encoding));
 
   PassesDecoderState::PipelineOptions options;
   options.use_slow_render_pipeline = false;
@@ -810,15 +818,16 @@ StatusOr<Image3F> ReconstructImage(
   options.render_spotcolors = false;
   options.render_noise = true;
 
-  JXL_RETURN_IF_ERROR(dec_state.PreparePipeline(
+  JXL_RETURN_IF_ERROR(dec_state->PreparePipeline(
       frame_header, &shared.metadata->m, &decoded, options));
 
-  hwy::AlignedUniquePtr<GroupDecCache[]> group_dec_caches;
+  AlignedArray<GroupDecCache> group_dec_caches;
   const auto allocate_storage = [&](const size_t num_threads) -> Status {
     JXL_RETURN_IF_ERROR(
-        dec_state.render_pipeline->PrepareForThreads(num_threads,
-                                                     /*use_group_ids=*/false));
-    group_dec_caches = hwy::MakeUniqueAlignedArray<GroupDecCache>(num_threads);
+        dec_state->render_pipeline->PrepareForThreads(num_threads,
+                                                      /*use_group_ids=*/false));
+    JXL_ASSIGN_OR_RETURN(group_dec_caches, AlignedArray<GroupDecCache>::Create(
+                                               memory_manager, num_threads));
     return true;
   };
   const auto process_group = [&](const uint32_t group_index,
@@ -826,15 +835,15 @@ StatusOr<Image3F> ReconstructImage(
     if (frame_header.loop_filter.epf_iters > 0) {
       JXL_RETURN_IF_ERROR(ComputeSigma(frame_header.loop_filter,
                                        frame_dim.BlockGroupRect(group_index),
-                                       &dec_state));
+                                       dec_state.get()));
     }
     RenderPipelineInput input =
-        dec_state.render_pipeline->GetInputBuffers(group_index, thread);
+        dec_state->render_pipeline->GetInputBuffers(group_index, thread);
     JXL_RETURN_IF_ERROR(DecodeGroupForRoundtrip(
-        frame_header, coeffs, group_index, &dec_state,
+        frame_header, coeffs, group_index, dec_state.get(),
         &group_dec_caches[thread], thread, input, nullptr, nullptr));
     if ((frame_header.flags & FrameHeader::kNoise) != 0) {
-      PrepareNoiseInput(dec_state, shared.frame_dim, frame_header, group_index,
+      PrepareNoiseInput(*dec_state, shared.frame_dim, frame_header, group_index,
                         thread);
     }
     JXL_RETURN_IF_ERROR(input.Done());
@@ -845,35 +854,40 @@ StatusOr<Image3F> ReconstructImage(
   return std::move(*decoded.color());
 }
 
+  
 float ComputeBlockL2Distance(const Image3F& a, const Image3F& b,
                              const ImageF& mask1x1, size_t by, size_t bx) {
   Rect rect(bx * kBlockDim, by * kBlockDim, kBlockDim, kBlockDim, a.xsize(),
             a.ysize());
-  float err2 = 0.0f;
-  static const float kXYBWeights[] = {36.0f, 1.0f, 0.2f};
+  float err2[3] = {0.0f};
   for (size_t y = 0; y < rect.ysize(); ++y) {
-    const float* row_a_x = rect.ConstPlaneRow(a, 0, y);
-    const float* row_a_y = rect.ConstPlaneRow(a, 1, y);
-    const float* row_a_b = rect.ConstPlaneRow(a, 2, y);
-    const float* row_b_x = rect.ConstPlaneRow(b, 0, y);
-    const float* row_b_y = rect.ConstPlaneRow(b, 1, y);
-    const float* row_b_b = rect.ConstPlaneRow(b, 2, y);
+    const float* row_a[3] = {
+        rect.ConstPlaneRow(a, 0, y),
+        rect.ConstPlaneRow(a, 1, y),
+        rect.ConstPlaneRow(a, 2, y),
+    };
+    const float* row_b[3] = {
+        rect.ConstPlaneRow(b, 0, y),
+        rect.ConstPlaneRow(b, 1, y),
+        rect.ConstPlaneRow(b, 2, y),
+    };
     const float* row_mask = rect.ConstRow(mask1x1, y);
-
     for (size_t x = 0; x < rect.xsize(); ++x) {
       float mask = row_mask[x];
-      for (size_t c = 0; c < 3; ++c) {
-        float diff_x = row_a_x[x] - row_b_x[x];
-        float diff_y = row_a_y[x] - row_b_y[x];
-        float diff_b = row_a_b[x] - row_b_b[x];
-        err2 += (kXYBWeights[0] * diff_x * diff_x +
-                 kXYBWeights[1] * diff_y * diff_y +
-                 kXYBWeights[2] * diff_b * diff_b) *
-                mask * mask;
+      float mask2 = mask * mask;
+      for (int i = 0; i < 3; ++i) {
+	float diff = row_a[i][x] - row_b[i][x];
+	err2[i] += mask2 * diff * diff;
       }
     }
   }
-  return err2;
+  static const double kW[] = {
+      12.339445295782363,
+      1.0,
+      0.2,
+  };
+  float retval = kW[0] * err2[0] + kW[1] * err2[1] + kW[2] * err2[2];
+  return retval;
 }
 
 Status ComputeARHeuristics(const FrameHeader& frame_header,
@@ -887,6 +901,7 @@ Status ComputeARHeuristics(const FrameHeader& frame_header,
   ImageB& epf_sharpness = shared.epf_sharpness;
   JxlMemoryManager* memory_manager = enc_state->memory_manager();
 
+  float clamped_butteraugli = std::min(5.0f, cparams.butteraugli_distance);
   if (cparams.butteraugli_distance < kMinButteraugliForDynamicAR ||
       cparams.speed_tier > SpeedTier::kWombat ||
       frame_header.loop_filter.epf_iters == 0) {
@@ -900,10 +915,16 @@ Status ComputeARHeuristics(const FrameHeader& frame_header,
     epf_steps.push_back(4);
   } else {
     epf_steps.push_back(0);
-    epf_steps.push_back(3);
+    epf_steps.push_back(2);
     epf_steps.push_back(7);
   }
   static const int kNumEPFVals = 8;
+  size_t epf_steps_lut[kNumEPFVals] = {0};
+  {
+    for (size_t i = 0; i < epf_steps.size(); ++i) {
+      epf_steps_lut[epf_steps[i]] = i;
+    }
+  }
   std::array<ImageF, kNumEPFVals> error_images;
   for (uint8_t val : epf_steps) {
     FillPlane(val, &epf_sharpness, Rect(epf_sharpness));
@@ -917,12 +938,13 @@ Status ComputeARHeuristics(const FrameHeader& frame_header,
       float* error_row = error_images[val].Row(by);
       for (size_t bx = 0; bx < frame_dim.xsize_blocks; bx++) {
         error_row[bx] = ComputeBlockL2Distance(
-            orig_opsin, decoded, initial_quant_masking1x1, by, bx);
+	    orig_opsin, decoded, initial_quant_masking1x1, by, bx);
       }
     }
   }
-  std::vector<std::vector<size_t>> histo(4, std::vector<size_t>(kNumEPFVals));
-  std::vector<size_t> totals(4, 1);
+  std::vector<std::vector<size_t>> histo(9, std::vector<size_t>(kNumEPFVals));
+  std::vector<size_t> totals(9, 1);
+  static const float kFavorNoSmoothing = 0.99;
   for (size_t by = 0; by < frame_dim.ysize_blocks; by++) {
     uint8_t* JXL_RESTRICT out_row = epf_sharpness.Row(by);
     uint8_t* JXL_RESTRICT prev_row = epf_sharpness.Row(by > 0 ? by - 1 : 0);
@@ -936,27 +958,44 @@ Status ComputeARHeuristics(const FrameHeader& frame_header,
       for (uint8_t val : epf_steps) {
         float error = error_images[val].Row(by)[bx];
         if (val == 0) {
-          error *= 0.97f;
+	  error *= kFavorNoSmoothing;
         }
         if (error < best_error) {
           best_val = val;
           best_error = error;
         }
       }
-      if (best_error < 0.995 * std::min(top_error, left_error)) {
+      if (best_error < std::min(top_error, left_error)) {
         out_row[bx] = best_val;
       } else if (top_error < left_error) {
         out_row[bx] = top_val;
       } else {
         out_row[bx] = left_val;
       }
-      int context = ((top_val > 3) ? 2 : 0) + ((left_val > 3) ? 1 : 0);
+      int context = epf_steps_lut[top_val] * 3 + epf_steps_lut[left_val];
       ++histo[context][out_row[bx]];
       ++totals[context];
     }
   }
-  const float context_weight =
-      0.14f + 0.007f * std::min(10.0f, cparams.butteraugli_distance);
+  const float c3base = 0.98017198824148288;
+  const float c3clamp = 0.85970338919928291;
+  const float c3 = std::max(c3clamp, std::pow(c3base, clamped_butteraugli));
+  static const float c5 = 0.1087690359555803;
+  float mul[3 * 3 * 3] = {0};
+  for (uint8_t top_val : epf_steps) {
+    for (uint8_t left_val : epf_steps) {
+      for (uint8_t val : epf_steps) {
+        int context = epf_steps_lut[top_val] * 3 + epf_steps_lut[left_val];
+        const auto& ctx_histo = histo[context];
+        const int mulix = epf_steps_lut[val] + 3 * context;
+        mul[mulix] = 1.0 / (1.0 + c5 * std::log1p(ctx_histo[val] /
+						  totals[context]) / clamped_butteraugli);
+        if (val == 0) {
+          mul[mulix] *= c3;
+        }
+      }
+    }
+  }
   for (size_t by = 0; by < frame_dim.ysize_blocks; by++) {
     uint8_t* JXL_RESTRICT out_row = epf_sharpness.Row(by);
     uint8_t* JXL_RESTRICT prev_row = epf_sharpness.Row(by > 0 ? by - 1 : 0);
@@ -965,13 +1004,10 @@ Status ComputeARHeuristics(const FrameHeader& frame_header,
       float best_error = std::numeric_limits<float>::max();
       uint8_t top_val = by > 0 ? prev_row[bx] : 0;
       uint8_t left_val = bx > 0 ? out_row[bx - 1] : 0;
-      int context = ((top_val > 3) ? 2 : 0) + ((left_val > 3) ? 1 : 0);
-      const auto& ctx_histo = histo[context];
+      int context = epf_steps_lut[top_val] * 3 + epf_steps_lut[left_val];
       for (uint8_t val : epf_steps) {
-        float error =
-            error_images[val].Row(by)[bx] /
-            (1 + std::log1p(ctx_histo[val] * context_weight / totals[context]));
-        if (val == 0) error *= 0.93f;
+        int mulix = epf_steps_lut[val] + 3 * context;
+        float error = error_images[val].Row(by)[bx] * mul[mulix];
         if (error < best_error) {
           best_val = val;
           best_error = error;
@@ -1049,8 +1085,8 @@ Status LossyFrameHeuristics(const FrameHeader& frame_header,
   //
   // output: Gaborished XYB, CfL, ACS, raw quant field, EPF control field.
 
-  AcStrategyHeuristics acs_heuristics(cparams);
-  CfLHeuristics cfl_heuristics;
+  AcStrategyHeuristics acs_heuristics(memory_manager, cparams);
+  CfLHeuristics cfl_heuristics(memory_manager);
   ImageF initial_quant_field;
   ImageF initial_quant_masking;
 
@@ -1111,7 +1147,7 @@ Status LossyFrameHeuristics(const FrameHeader& frame_header,
         memory_manager, cparams, modular_frame_encoder, &matrices));
   }
 
-  JXL_RETURN_IF_ERROR(cfl_heuristics.Init(memory_manager, rect));
+  JXL_RETURN_IF_ERROR(cfl_heuristics.Init(rect));
   JXL_RETURN_IF_ERROR(acs_heuristics.Init(*opsin, rect, initial_quant_field,
                                           initial_quant_masking,
                                           initial_quant_masking1x1, &matrices));
@@ -1161,8 +1197,8 @@ Status LossyFrameHeuristics(const FrameHeader& frame_header,
   size_t num_tiles = DivCeil(frame_dim.xsize_blocks, kEncTileDimInBlocks) *
                      DivCeil(frame_dim.ysize_blocks, kEncTileDimInBlocks);
   const auto prepare = [&](const size_t num_threads) -> Status {
-    acs_heuristics.PrepareForThreads(num_threads);
-    cfl_heuristics.PrepareForThreads(num_threads);
+    JXL_RETURN_IF_ERROR(acs_heuristics.PrepareForThreads(num_threads));
+    JXL_RETURN_IF_ERROR(cfl_heuristics.PrepareForThreads(num_threads));
     return true;
   };
   JXL_RETURN_IF_ERROR(

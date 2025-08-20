@@ -11,6 +11,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <memory>
 #include <string>
 #include <thread>
 #include <utility>
@@ -22,6 +23,7 @@
 #include "lib/jxl/common.h"
 #include "lib/jxl/frame_header.h"
 #include "lib/jxl/image_bundle.h"
+#include "lib/jxl/jpeg/jpeg_data.h"
 #include "lib/jxl/modular/options.h"
 #include "tools/no_memory_manager.h"
 #if defined(_WIN32) || defined(_WIN64)
@@ -35,12 +37,12 @@
 #include <random>
 #include <vector>
 
+#include "lib/extras/codec_in_out.h"
 #include "lib/extras/enc/encode.h"
 #include "lib/extras/enc/jpg.h"
 #include "lib/jxl/base/data_parallel.h"
 #include "lib/jxl/base/override.h"
 #include "lib/jxl/base/span.h"
-#include "lib/jxl/codec_in_out.h"
 #include "lib/jxl/enc_ans.h"
 #include "lib/jxl/enc_external_image.h"
 #include "lib/jxl/enc_params.h"
@@ -59,7 +61,7 @@ const size_t kMaxBitDepth = 24;  // The maximum reasonable bit depth supported.
 
 std::mutex stderr_mutex;
 
-typedef std::function<uint8_t()> PixelGenerator;
+using PixelGenerator = std::function<uint8_t()>;
 
 // ImageSpec needs to be a packed struct to allow us to use the raw memory of
 // the struct for hashing to create a consistent.
@@ -173,21 +175,20 @@ bool GenerateFile(const char* output_dir, const ImageSpec& spec,
 
   if (!quiet) {
     std::unique_lock<std::mutex> lock(stderr_mutex);
-    std::cerr << "Generating " << spec << " as " << hash_str << "\n"
-              << std::flush;
+    std::cerr << "Generating " << spec << " as " << hash_str << "\n";
   }
 
-  jxl::CodecInOut io{memory_manager};
+  auto io = jxl::make_unique<jxl::CodecInOut>(memory_manager);
   if (spec.bit_depth == 32) {
-    io.metadata.m.SetFloat32Samples();
+    io->metadata.m.SetFloat32Samples();
   } else {
-    io.metadata.m.SetUintSamples(spec.bit_depth);
+    io->metadata.m.SetUintSamples(spec.bit_depth);
   }
-  io.metadata.m.SetAlphaBits(spec.alpha_bit_depth,
-                             FROM_JXL_BOOL(spec.alpha_is_premultiplied));
-  io.metadata.m.orientation = spec.orientation;
-  io.frames.clear();
-  io.frames.reserve(spec.num_frames);
+  io->metadata.m.SetAlphaBits(spec.alpha_bit_depth,
+                              FROM_JXL_BOOL(spec.alpha_is_premultiplied));
+  io->metadata.m.orientation = spec.orientation;
+  io->frames.clear();
+  io->frames.reserve(spec.num_frames);
 
   jxl::ColorEncoding c;
   if (spec.num_channels == 1) {
@@ -212,14 +213,14 @@ bool GenerateFile(const char* output_dir, const ImageSpec& spec,
   ppf.info.num_color_channels = spec.num_channels ? 1 : 3;
   ppf.info.bits_per_sample = spec.bit_depth;
   for (uint32_t frame = 0; frame < spec.num_frames; frame++) {
-    jxl::ImageBundle ib(memory_manager, &io.metadata.m);
+    jxl::ImageBundle ib(memory_manager, &io->metadata.m);
     const bool has_alpha = (spec.alpha_bit_depth != 0);
     const int alpha_channels = (has_alpha ? 1 : 0);
     const size_t bytes_per_sample =
-        jxl::DivCeil(io.metadata.m.bit_depth.bits_per_sample, 8);
+        jxl::DivCeil(io->metadata.m.bit_depth.bits_per_sample, 8);
     const size_t bytes_per_pixel =
         bytes_per_sample *
-        (io.metadata.m.color_encoding.Channels() + alpha_channels);
+        (io->metadata.m.color_encoding.Channels() + alpha_channels);
     const size_t row_size = spec.width * bytes_per_pixel;
     std::vector<uint8_t> img_data(row_size * spec.height, 0);
     for (size_t y = 0; y < spec.height; y++) {
@@ -236,9 +237,9 @@ bool GenerateFile(const char* output_dir, const ImageSpec& spec,
     JxlPixelFormat format = {num_channels, data_type, JXL_LITTLE_ENDIAN, 0};
     const jxl::Span<const uint8_t> span(img_data.data(), img_data.size());
     JXL_RETURN_IF_ERROR(ConvertFromExternal(
-        span, spec.width, spec.height, io.metadata.m.color_encoding,
-        io.metadata.m.bit_depth.bits_per_sample, format, nullptr, &ib));
-    io.frames.push_back(std::move(ib));
+        span, spec.width, spec.height, io->metadata.m.color_encoding,
+        io->metadata.m.bit_depth.bits_per_sample, format, nullptr, &ib));
+    io->frames.push_back(std::move(ib));
     JXL_ASSIGN_OR_RETURN(
         jxl::extras::PackedFrame packed_frame,
         jxl::extras::PackedFrame::Create(spec.width, spec.height, format));
@@ -255,25 +256,28 @@ bool GenerateFile(const char* output_dir, const ImageSpec& spec,
     // If this image is supposed to be a reconstructible JPEG, collect the JPEG
     // metadata and encode it in the beginning of the compressed bytes.
     std::vector<uint8_t> jpeg_bytes;
-    io.jpeg_quality = 70;
+    io->jpeg_quality = 70;
     auto encoder = jxl::extras::GetJPEGEncoder();
     encoder->SetOption("quality", "70");
     jxl::extras::EncodedImage encoded;
     JXL_RETURN_IF_ERROR(encoder->Encode(ppf, &encoded, nullptr));
     jpeg_bytes = encoded.bitstreams[0];
-    JXL_RETURN_IF_ERROR(jxl::jpeg::DecodeImageJPG(
-        jxl::Bytes(jpeg_bytes.data(), jpeg_bytes.size()), &io));
-    std::vector<uint8_t> jpeg_data;
-    JXL_RETURN_IF_ERROR(EncodeJPEGData(memory_manager, *io.Main().jpeg_data,
-                                       &jpeg_data, params));
+    JXL_TEST_ASSIGN_OR_DIE(
+        std::unique_ptr<jxl::jpeg::JPEGData> jpeg_data,
+        jxl::jpeg::ParseJPG(memory_manager, jxl::Bytes(jpeg_bytes)));
+    JXL_RETURN_IF_ERROR(
+        jxl::test::JpegDataToCodecInOut(std::move(jpeg_data), io.get()));
+    std::vector<uint8_t> encoded_jpeg_data;
+    JXL_RETURN_IF_ERROR(EncodeJPEGData(memory_manager, *io->Main().jpeg_data,
+                                       &encoded_jpeg_data, params));
     std::vector<uint8_t> header;
     header.insert(header.end(), jxl::kContainerHeader.begin(),
                   jxl::kContainerHeader.end());
-    jxl::AppendBoxHeader(jxl::MakeBoxType("jbrd"), jpeg_data.size(), false,
-                         &header);
-    jxl::Bytes(jpeg_data).AppendTo(header);
+    jxl::AppendBoxHeader(jxl::MakeBoxType("jbrd"), encoded_jpeg_data.size(),
+                         false, &header);
+    jxl::Bytes(encoded_jpeg_data).AppendTo(header);
     jxl::AppendBoxHeader(jxl::MakeBoxType("jxlc"), 0, true, &header);
-    compressed.append(header);
+    JXL_RETURN_IF_ERROR(compressed.append(header));
   }
 
   params.modular_mode = spec.params.modular_mode;
@@ -286,18 +290,21 @@ bool GenerateFile(const char* output_dir, const ImageSpec& spec,
 
   // EncodeFile replaces output; pass a temporary storage for it.
   std::vector<uint8_t> compressed_image;
-  bool ok = jxl::test::EncodeFile(params, &io, &compressed_image);
+  bool ok = jxl::test::EncodeFile(params, io.get(), &compressed_image);
   if (!ok) return false;
-  compressed.append(compressed_image);
+  JXL_RETURN_IF_ERROR(compressed.append(compressed_image));
 
   // Append 4 bytes with the flags used by djxl_fuzzer to select the decoding
   // output.
   std::uniform_int_distribution<> dis256(0, 255);
   if (spec.override_decoder_spec == 0xFFFFFFFF) {
-    for (size_t i = 0; i < 4; ++i) compressed.push_back(dis256(mt));
+    for (size_t i = 0; i < 4; ++i) {
+      JXL_RETURN_IF_ERROR(compressed.push_back(dis256(mt)));
+    }
   } else {
     for (size_t i = 0; i < 4; ++i) {
-      compressed.push_back(spec.override_decoder_spec >> (8 * i));
+      JXL_RETURN_IF_ERROR(
+          compressed.push_back(spec.override_decoder_spec >> (8 * i)));
     }
   }
 
@@ -305,8 +312,7 @@ bool GenerateFile(const char* output_dir, const ImageSpec& spec,
   if (!quiet) {
     std::unique_lock<std::mutex> lock(stderr_mutex);
     std::cerr << "Stored " << output_fn << " size: " << compressed.size()
-              << "\n"
-              << std::flush;
+              << "\n";
   }
 
   return true;
@@ -447,7 +453,7 @@ int main(int argc, const char** argv) {
                     spec.orientation = 1 + (mt() % 8);
                     if (!spec.Validate()) {
                       if (!quiet) {
-                        std::cerr << "Skipping " << spec << "\n" << std::flush;
+                        std::cerr << "Skipping " << spec << "\n";
                       }
                     } else {
                       specs.push_back(spec);
@@ -479,10 +485,10 @@ int main(int argc, const char** argv) {
     };
     if (!RunOnPool(pool.get(), 0, specs.size(), jxl::ThreadPool::NoInit,
                    generate, "FuzzerCorpus")) {
-      std::cerr << "Error generating fuzzer corpus\n" << std::flush;
+      std::cerr << "Error generating fuzzer corpus\n";
       return 1;
     }
   }
-  std::cerr << "Finished generating fuzzer corpus\n" << std::flush;
+  std::cerr << "Finished generating fuzzer corpus\n";
   return 0;
 }

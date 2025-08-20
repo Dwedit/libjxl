@@ -7,7 +7,8 @@
 # Tests implemented in bash. These typically will run checks about the source
 # code rather than the compiled one.
 
-MYDIR=$(dirname $(realpath "$0"))
+SELF=$(realpath "$0")
+MYDIR=$(dirname "${SELF}")
 
 set -u
 
@@ -22,6 +23,11 @@ test_includes() {
     # of the library will include the library as: #include "jxl/foobar.h".
     if grep -i -H -n -E '#include\s*[<"]lib/include/jxl' "$f" >&2; then
       echo "Don't add \"include/\" to the include path of public headers." >&2
+      ret=1
+    fi
+    # Check that jxl and hwy includes are system-styled.
+    if grep -i -H -n -E '#include\s*"(hwy|jxl)' "$f" >&2; then
+      echo "Use system includes for hwy/ and jxl/ public headers." >&2
       ret=1
     fi
 
@@ -99,13 +105,21 @@ test_printf_size_t() {
       "'%\" PRIuS \"' or '%\" PRIdS \"'." >&2
     ret=1
   fi
+  return ${ret}
+}
 
+test_no_include_gtest() {
+  local ret=0
   if grep -n -E '[^_]gtest\.h' \
       $(git ls-files | grep -E '(\.c|\.cc|\.cpp|\.h)$' | grep -v -F /testing.h); then
     echo "Don't include gtest directly, instead include 'testing.h'. " >&2
     ret=1
   fi
+  return ${ret}
+}
 
+test_include_printf_macros() {
+  local ret=0
   local f
   for f in $(git ls-files | grep -E "\.cc$" | xargs grep 'PRI[udx]S' |
       cut -f 1 -d : | uniq); do
@@ -118,7 +132,11 @@ test_printf_size_t() {
       ret=1
     fi
   done
+  return ${ret}
+}
 
+test_no_priudxs_in_headers() {
+  local ret=0
   for f in $(git ls-files | grep -E "\.h$" | grep -v -E '(printf_macros\.h|testing\.h)' |
       xargs grep -n 'PRI[udx]S'); do
     # Having PRIuS / PRIdS in a header file means that printf_macros.h may
@@ -127,7 +145,6 @@ test_printf_size_t() {
     echo "$f: Don't use PRI.S in header files. Sorry."
     ret=1
   done
-
   return ${ret}
 }
 
