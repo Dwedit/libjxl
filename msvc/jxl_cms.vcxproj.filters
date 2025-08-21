@@ -147,6 +147,24 @@
     <ClInclude Include="..\third_party\lcms\src\lcms2_internal.h">
       <Filter>Source Files\third_party\lcms</Filter>
     </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\abort.h">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\auto_tune.h">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\bit_set.h">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\perf_counters.h">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\stats.h">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\x86_cpuid.h">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\lib\jxl\cms\jxl_cms.cc">
@@ -248,10 +266,25 @@
     <ClCompile Include="..\third_party\lcms\src\cmsxform.c">
       <Filter>Source Files\third_party\lcms</Filter>
     </ClCompile>
+    <ClCompile Include="..\third_party\highway\hwy\abort.cc">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\highway\hwy\perf_counters.cc">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\highway\hwy\profiler.cc">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\highway\hwy\stats.cc">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\third_party\lcms\src\lcms2.def">
       <Filter>Source Files\third_party\lcms</Filter>
+    </None>
+    <None Include="..\third_party\highway\hwy\hwy.version">
+      <Filter>Source Files\third_party\highway</Filter>
     </None>
   </ItemGroup>
 </Project>

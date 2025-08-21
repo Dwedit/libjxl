@@ -214,7 +214,6 @@
     <ClInclude Include="..\lib\jxl\box_content_decoder.h" />
     <ClInclude Include="..\lib\jxl\butteraugli\butteraugli.h" />
     <ClInclude Include="..\lib\jxl\chroma_from_luma.h" />
-    <ClInclude Include="..\lib\jxl\codec_in_out.h" />
     <ClInclude Include="..\lib\jxl\coeff_order.h" />
     <ClInclude Include="..\lib\jxl\coeff_order_fwd.h" />
     <ClInclude Include="..\lib\jxl\color_encoding_internal.h" />
@@ -224,7 +223,6 @@
     <ClInclude Include="..\lib\jxl\convolve.h" />
     <ClInclude Include="..\lib\jxl\dct-inl.h" />
     <ClInclude Include="..\lib\jxl\dct_block-inl.h" />
-    <ClInclude Include="..\lib\jxl\dct_for_test.h" />
     <ClInclude Include="..\lib\jxl\dct_scales.h" />
     <ClInclude Include="..\lib\jxl\dct_util.h" />
     <ClInclude Include="..\lib\jxl\decode_to_jpeg.h" />
@@ -248,6 +246,7 @@
     <ClInclude Include="..\lib\jxl\enc_adaptive_quantization.h" />
     <ClInclude Include="..\lib\jxl\enc_ans.h" />
     <ClInclude Include="..\lib\jxl\enc_ans_params.h" />
+    <ClInclude Include="..\lib\jxl\enc_ans_simd.h" />
     <ClInclude Include="..\lib\jxl\enc_aux_out.h" />
     <ClInclude Include="..\lib\jxl\enc_bit_writer.h" />
     <ClInclude Include="..\lib\jxl\enc_butteraugli_comparator.h" />
@@ -274,7 +273,9 @@
     <ClInclude Include="..\lib\jxl\enc_icc_codec.h" />
     <ClInclude Include="..\lib\jxl\enc_image_bundle.h" />
     <ClInclude Include="..\lib\jxl\enc_linalg.h" />
+    <ClInclude Include="..\lib\jxl\enc_lz77.h" />
     <ClInclude Include="..\lib\jxl\enc_modular.h" />
+    <ClInclude Include="..\lib\jxl\enc_modular_simd.h" />
     <ClInclude Include="..\lib\jxl\enc_noise.h" />
     <ClInclude Include="..\lib\jxl\enc_optimize.h" />
     <ClInclude Include="..\lib\jxl\enc_params.h" />
@@ -289,6 +290,7 @@
     <ClInclude Include="..\lib\jxl\enc_xyb.h" />
     <ClInclude Include="..\lib\jxl\entropy_coder.h" />
     <ClInclude Include="..\lib\jxl\epf.h" />
+    <ClInclude Include="..\lib\jxl\fake_parallel_runner_testonly.h" />
     <ClInclude Include="..\lib\jxl\fast_dct-inl.h" />
     <ClInclude Include="..\lib\jxl\fast_dct128-inl.h" />
     <ClInclude Include="..\lib\jxl\fast_dct16-inl.h" />
@@ -300,6 +302,7 @@
     <ClInclude Include="..\lib\jxl\field_encodings.h" />
     <ClInclude Include="..\lib\jxl\frame_dimensions.h" />
     <ClInclude Include="..\lib\jxl\frame_header.h" />
+    <ClInclude Include="..\lib\jxl\fuzztest.h" />
     <ClInclude Include="..\lib\jxl\headers.h" />
     <ClInclude Include="..\lib\jxl\huffman_table.h" />
     <ClInclude Include="..\lib\jxl\icc_codec.h" />
@@ -338,6 +341,7 @@
     <ClInclude Include="..\lib\jxl\modular\transform\palette.h" />
     <ClInclude Include="..\lib\jxl\modular\transform\rct.h" />
     <ClInclude Include="..\lib\jxl\modular\transform\squeeze.h" />
+    <ClInclude Include="..\lib\jxl\modular\transform\squeeze_params.h" />
     <ClInclude Include="..\lib\jxl\modular\transform\transform.h" />
     <ClInclude Include="..\lib\jxl\noise.h" />
     <ClInclude Include="..\lib\jxl\opsin_params.h" />
@@ -430,8 +434,11 @@
     <ClInclude Include="..\third_party\brotli\c\enc\static_dict_lut.h" />
     <ClInclude Include="..\third_party\brotli\c\enc\utf8_util.h" />
     <ClInclude Include="..\third_party\brotli\c\enc\write_bits.h" />
+    <ClInclude Include="..\third_party\highway\hwy\abort.h" />
     <ClInclude Include="..\third_party\highway\hwy\aligned_allocator.h" />
+    <ClInclude Include="..\third_party\highway\hwy\auto_tune.h" />
     <ClInclude Include="..\third_party\highway\hwy\base.h" />
+    <ClInclude Include="..\third_party\highway\hwy\bit_set.h" />
     <ClInclude Include="..\third_party\highway\hwy\cache_control.h" />
     <ClInclude Include="..\third_party\highway\hwy\detect_compiler_arch.h" />
     <ClInclude Include="..\third_party\highway\hwy\detect_targets.h" />
@@ -449,14 +456,17 @@
     <ClInclude Include="..\third_party\highway\hwy\ops\x86_128-inl.h" />
     <ClInclude Include="..\third_party\highway\hwy\ops\x86_256-inl.h" />
     <ClInclude Include="..\third_party\highway\hwy\ops\x86_512-inl.h" />
+    <ClInclude Include="..\third_party\highway\hwy\perf_counters.h" />
     <ClInclude Include="..\third_party\highway\hwy\per_target.h" />
     <ClInclude Include="..\third_party\highway\hwy\print-inl.h" />
     <ClInclude Include="..\third_party\highway\hwy\print.h" />
     <ClInclude Include="..\third_party\highway\hwy\profiler.h" />
     <ClInclude Include="..\third_party\highway\hwy\robust_statistics.h" />
+    <ClInclude Include="..\third_party\highway\hwy\stats.h" />
     <ClInclude Include="..\third_party\highway\hwy\targets.h" />
     <ClInclude Include="..\third_party\highway\hwy\timer-inl.h" />
     <ClInclude Include="..\third_party\highway\hwy\timer.h" />
+    <ClInclude Include="..\third_party\highway\hwy\x86_cpuid.h" />
     <ClInclude Include="jxl\jxl\jxl_export.h" />
     <ClInclude Include="jxl\jxl\jxl_threads_export.h" />
     <ClInclude Include="jxl\jxl\version.h" />
@@ -473,14 +483,13 @@
     <ClCompile Include="..\lib\jxl\coeff_order.cc" />
     <ClCompile Include="..\lib\jxl\color_encoding_internal.cc" />
     <ClCompile Include="..\lib\jxl\compressed_dc.cc" />
-    <ClCompile Include="..\lib\jxl\convolve_separable5.cc" />
     <ClCompile Include="..\lib\jxl\convolve_slow.cc" />
-    <ClCompile Include="..\lib\jxl\convolve_symmetric3.cc" />
     <ClCompile Include="..\lib\jxl\convolve_symmetric5.cc" />
     <ClCompile Include="..\lib\jxl\dct_scales.cc" />
     <ClCompile Include="..\lib\jxl\decode.cc" />
     <ClCompile Include="..\lib\jxl\decode_to_jpeg.cc" />
     <ClCompile Include="..\lib\jxl\dec_ans.cc" />
+    <ClCompile Include="..\lib\jxl\dec_bit_reader.cc" />
     <ClCompile Include="..\lib\jxl\dec_cache.cc" />
     <ClCompile Include="..\lib\jxl\dec_context_map.cc" />
     <ClCompile Include="..\lib\jxl\dec_external_image.cc" />
@@ -496,6 +505,7 @@
     <ClCompile Include="..\lib\jxl\enc_ac_strategy.cc" />
     <ClCompile Include="..\lib\jxl\enc_adaptive_quantization.cc" />
     <ClCompile Include="..\lib\jxl\enc_ans.cc" />
+    <ClCompile Include="..\lib\jxl\enc_ans_simd.cc" />
     <ClCompile Include="..\lib\jxl\enc_aux_out.cc" />
     <ClCompile Include="..\lib\jxl\enc_bit_writer.cc" />
     <ClCompile Include="..\lib\jxl\enc_butteraugli_comparator.cc" />
@@ -505,6 +515,7 @@
     <ClCompile Include="..\lib\jxl\enc_coeff_order.cc" />
     <ClCompile Include="..\lib\jxl\enc_comparator.cc" />
     <ClCompile Include="..\lib\jxl\enc_context_map.cc" />
+    <ClCompile Include="..\lib\jxl\enc_convolve_separable5.cc" />
     <ClCompile Include="..\lib\jxl\enc_debug_image.cc" />
     <ClCompile Include="..\lib\jxl\enc_detect_dots.cc" />
     <ClCompile Include="..\lib\jxl\enc_dot_dictionary.cc" />
@@ -521,7 +532,9 @@
     <ClCompile Include="..\lib\jxl\enc_icc_codec.cc" />
     <ClCompile Include="..\lib\jxl\enc_image_bundle.cc" />
     <ClCompile Include="..\lib\jxl\enc_linalg.cc" />
+    <ClCompile Include="..\lib\jxl\enc_lz77.cc" />
     <ClCompile Include="..\lib\jxl\enc_modular.cc" />
+    <ClCompile Include="..\lib\jxl\enc_modular_simd.cc" />
     <ClCompile Include="..\lib\jxl\enc_noise.cc" />
     <ClCompile Include="..\lib\jxl\enc_patch_dictionary.cc" />
     <ClCompile Include="..\lib\jxl\enc_photon_noise.cc" />
@@ -565,6 +578,7 @@
     <ClCompile Include="..\lib\jxl\modular\transform\palette.cc" />
     <ClCompile Include="..\lib\jxl\modular\transform\rct.cc" />
     <ClCompile Include="..\lib\jxl\modular\transform\squeeze.cc" />
+    <ClCompile Include="..\lib\jxl\modular\transform\squeeze_params.cc" />
     <ClCompile Include="..\lib\jxl\modular\transform\transform.cc" />
     <ClCompile Include="..\lib\jxl\opsin_params.cc" />
     <ClCompile Include="..\lib\jxl\passes_state.cc" />
@@ -572,6 +586,7 @@
     <ClCompile Include="..\lib\jxl\quant_weights.cc" />
     <ClCompile Include="..\lib\jxl\render_pipeline\low_memory_render_pipeline.cc" />
     <ClCompile Include="..\lib\jxl\render_pipeline\render_pipeline.cc" />
+    <ClCompile Include="..\lib\jxl\render_pipeline\render_pipeline_stage.cc" />
     <ClCompile Include="..\lib\jxl\render_pipeline\simple_render_pipeline.cc" />
     <ClCompile Include="..\lib\jxl\render_pipeline\stage_blending.cc" />
     <ClCompile Include="..\lib\jxl\render_pipeline\stage_chroma_upsampling.cc" />
@@ -592,12 +607,25 @@
     <ClCompile Include="..\lib\jxl\simd_util.cc" />
     <ClCompile Include="..\lib\jxl\splines.cc" />
     <ClCompile Include="..\lib\jxl\toc.cc" />
+    <ClCompile Include="..\third_party\highway\hwy\abort.cc" />
     <ClCompile Include="..\third_party\highway\hwy\aligned_allocator.cc" />
     <ClCompile Include="..\third_party\highway\hwy\nanobenchmark.cc" />
+    <ClCompile Include="..\third_party\highway\hwy\perf_counters.cc" />
     <ClCompile Include="..\third_party\highway\hwy\per_target.cc" />
     <ClCompile Include="..\third_party\highway\hwy\print.cc" />
+    <ClCompile Include="..\third_party\highway\hwy\profiler.cc" />
+    <ClCompile Include="..\third_party\highway\hwy\stats.cc" />
     <ClCompile Include="..\third_party\highway\hwy\targets.cc" />
     <ClCompile Include="..\third_party\highway\hwy\timer.cc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\lib\jxl\jxl.syms" />
+    <None Include="..\lib\jxl\jxl.version" />
+    <None Include="..\lib\jxl\jxl_osx.syms" />
+    <None Include="..\lib\jxl\libjxl.pc.in" />
+    <None Include="..\lib\jxl\libjxl_cms.pc.in" />
+    <None Include="..\lib\jxl\version.h.in" />
+    <None Include="..\third_party\highway\hwy\hwy.version" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

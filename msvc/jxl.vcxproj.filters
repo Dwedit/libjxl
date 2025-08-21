@@ -183,9 +183,6 @@
     <ClInclude Include="..\lib\jxl\chroma_from_luma.h">
       <Filter>Source Files\lib\jxl</Filter>
     </ClInclude>
-    <ClInclude Include="..\lib\jxl\codec_in_out.h">
-      <Filter>Source Files\lib\jxl</Filter>
-    </ClInclude>
     <ClInclude Include="..\lib\jxl\coeff_order.h">
       <Filter>Source Files\lib\jxl</Filter>
     </ClInclude>
@@ -777,9 +774,6 @@
     <ClInclude Include="..\third_party\brotli\c\enc\state.h">
       <Filter>Source Files\third_party\brotli\enc</Filter>
     </ClInclude>
-    <ClInclude Include="..\lib\jxl\dct_for_test.h">
-      <Filter>Source Files\lib\jxl</Filter>
-    </ClInclude>
     <ClInclude Include="..\lib\jxl\dec_cache.h">
       <Filter>Source Files\lib\jxl</Filter>
     </ClInclude>
@@ -902,6 +896,42 @@
     </ClInclude>
     <ClInclude Include="..\lib\jxl\sanitizers.h">
       <Filter>Source Files\lib\jxl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\jxl\enc_ans_simd.h">
+      <Filter>Source Files\lib\jxl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\jxl\enc_lz77.h">
+      <Filter>Source Files\lib\jxl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\jxl\enc_modular_simd.h">
+      <Filter>Source Files\lib\jxl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\jxl\fake_parallel_runner_testonly.h">
+      <Filter>Source Files\lib\jxl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\jxl\fuzztest.h">
+      <Filter>Source Files\lib\jxl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\jxl\modular\transform\squeeze_params.h">
+      <Filter>Source Files\lib\jxl\modular\transform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\abort.h">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\auto_tune.h">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\bit_set.h">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\perf_counters.h">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\stats.h">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\x86_cpuid.h">
+      <Filter>Source Files\third_party\highway</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1244,13 +1274,7 @@
     <ClCompile Include="..\lib\jxl\modular\encoding\enc_debug_tree.cc">
       <Filter>Source Files\lib\jxl\modular\encoding</Filter>
     </ClCompile>
-    <ClCompile Include="..\lib\jxl\convolve_separable5.cc">
-      <Filter>Source Files\lib\jxl</Filter>
-    </ClCompile>
     <ClCompile Include="..\lib\jxl\convolve_slow.cc">
-      <Filter>Source Files\lib\jxl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\lib\jxl\convolve_symmetric3.cc">
       <Filter>Source Files\lib\jxl</Filter>
     </ClCompile>
     <ClCompile Include="..\lib\jxl\convolve_symmetric5.cc">
@@ -1310,5 +1334,61 @@
     <ClCompile Include="..\lib\jxl\render_pipeline\stage_cms.cc">
       <Filter>Source Files\lib\jxl\render_pipeline</Filter>
     </ClCompile>
+    <ClCompile Include="..\lib\jxl\dec_bit_reader.cc">
+      <Filter>Source Files\lib\jxl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\jxl\enc_ans_simd.cc">
+      <Filter>Source Files\lib\jxl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\jxl\enc_convolve_separable5.cc">
+      <Filter>Source Files\lib\jxl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\jxl\enc_lz77.cc">
+      <Filter>Source Files\lib\jxl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\jxl\enc_modular_simd.cc">
+      <Filter>Source Files\lib\jxl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\jxl\render_pipeline\render_pipeline_stage.cc">
+      <Filter>Source Files\lib\jxl\render_pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\jxl\modular\transform\squeeze_params.cc">
+      <Filter>Source Files\lib\jxl\modular\transform</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\highway\hwy\abort.cc">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\highway\hwy\perf_counters.cc">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\highway\hwy\profiler.cc">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\highway\hwy\stats.cc">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\lib\jxl\jxl.syms">
+      <Filter>Source Files\lib\jxl</Filter>
+    </None>
+    <None Include="..\lib\jxl\jxl.version">
+      <Filter>Source Files\lib\jxl</Filter>
+    </None>
+    <None Include="..\lib\jxl\jxl_osx.syms">
+      <Filter>Source Files\lib\jxl</Filter>
+    </None>
+    <None Include="..\lib\jxl\libjxl.pc.in">
+      <Filter>Source Files\lib\jxl</Filter>
+    </None>
+    <None Include="..\lib\jxl\libjxl_cms.pc.in">
+      <Filter>Source Files\lib\jxl</Filter>
+    </None>
+    <None Include="..\lib\jxl\version.h.in">
+      <Filter>Source Files\lib\jxl</Filter>
+    </None>
+    <None Include="..\third_party\highway\hwy\hwy.version">
+      <Filter>Source Files\third_party\highway</Filter>
+    </None>
   </ItemGroup>
 </Project>

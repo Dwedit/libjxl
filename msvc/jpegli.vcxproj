@@ -49,8 +49,11 @@
     <ClInclude Include="..\lib\jpegli\transpose-inl.h" />
     <ClInclude Include="..\lib\jpegli\types.h" />
     <ClInclude Include="..\lib\jpegli\upsample.h" />
+    <ClInclude Include="..\third_party\highway\hwy\abort.h" />
     <ClInclude Include="..\third_party\highway\hwy\aligned_allocator.h" />
+    <ClInclude Include="..\third_party\highway\hwy\auto_tune.h" />
     <ClInclude Include="..\third_party\highway\hwy\base.h" />
+    <ClInclude Include="..\third_party\highway\hwy\bit_set.h" />
     <ClInclude Include="..\third_party\highway\hwy\cache_control.h" />
     <ClInclude Include="..\third_party\highway\hwy\detect_compiler_arch.h" />
     <ClInclude Include="..\third_party\highway\hwy\detect_targets.h" />
@@ -62,6 +65,9 @@
     <ClInclude Include="..\third_party\highway\hwy\ops\arm_sve-inl.h" />
     <ClInclude Include="..\third_party\highway\hwy\ops\emu128-inl.h" />
     <ClInclude Include="..\third_party\highway\hwy\ops\generic_ops-inl.h" />
+    <ClInclude Include="..\third_party\highway\hwy\ops\inside-inl.h" />
+    <ClInclude Include="..\third_party\highway\hwy\ops\loongarch_lasx-inl.h" />
+    <ClInclude Include="..\third_party\highway\hwy\ops\loongarch_lsx-inl.h" />
     <ClInclude Include="..\third_party\highway\hwy\ops\ppc_vsx-inl.h" />
     <ClInclude Include="..\third_party\highway\hwy\ops\rvv-inl.h" />
     <ClInclude Include="..\third_party\highway\hwy\ops\scalar-inl.h" />
@@ -73,14 +79,18 @@
     <ClInclude Include="..\third_party\highway\hwy\ops\x86_128-inl.h" />
     <ClInclude Include="..\third_party\highway\hwy\ops\x86_256-inl.h" />
     <ClInclude Include="..\third_party\highway\hwy\ops\x86_512-inl.h" />
+    <ClInclude Include="..\third_party\highway\hwy\ops\x86_avx3-inl.h" />
+    <ClInclude Include="..\third_party\highway\hwy\perf_counters.h" />
     <ClInclude Include="..\third_party\highway\hwy\per_target.h" />
     <ClInclude Include="..\third_party\highway\hwy\print-inl.h" />
     <ClInclude Include="..\third_party\highway\hwy\print.h" />
     <ClInclude Include="..\third_party\highway\hwy\profiler.h" />
     <ClInclude Include="..\third_party\highway\hwy\robust_statistics.h" />
+    <ClInclude Include="..\third_party\highway\hwy\stats.h" />
     <ClInclude Include="..\third_party\highway\hwy\targets.h" />
     <ClInclude Include="..\third_party\highway\hwy\timer-inl.h" />
     <ClInclude Include="..\third_party\highway\hwy\timer.h" />
+    <ClInclude Include="..\third_party\highway\hwy\x86_cpuid.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\lib\jpegli\adaptive_quantization.cc" />
@@ -109,12 +119,19 @@
     <ClCompile Include="..\lib\jpegli\simd.cc" />
     <ClCompile Include="..\lib\jpegli\source_manager.cc" />
     <ClCompile Include="..\lib\jpegli\upsample.cc" />
+    <ClCompile Include="..\third_party\highway\hwy\abort.cc" />
     <ClCompile Include="..\third_party\highway\hwy\aligned_allocator.cc" />
     <ClCompile Include="..\third_party\highway\hwy\nanobenchmark.cc" />
+    <ClCompile Include="..\third_party\highway\hwy\perf_counters.cc" />
     <ClCompile Include="..\third_party\highway\hwy\per_target.cc" />
     <ClCompile Include="..\third_party\highway\hwy\print.cc" />
+    <ClCompile Include="..\third_party\highway\hwy\profiler.cc" />
+    <ClCompile Include="..\third_party\highway\hwy\stats.cc" />
     <ClCompile Include="..\third_party\highway\hwy\targets.cc" />
     <ClCompile Include="..\third_party\highway\hwy\timer.cc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\third_party\highway\hwy\hwy.version" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -202,7 +219,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>JPEGXL_MAJOR_VERSION=0;JPEGXL_MINOR_VERSION=10;JPEGXL_PATCH_VERSION=2;_CRT_SECURE_NO_WARNINGS;BROTLI_SHARED_COMPILATION;_WIN32;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\lib;$(ProjectDir)..\third_party\highway;$(ProjectDir)..\third_party\googletest\googletest\include;$(ProjectDir)..\lib\include;$(ProjectDir)..\third_party\googletest\googlemock\include;$(ProjectDir)..\third_party\brotli\c\include;$(ProjectDir)..\third_party\lcms\include;$(ProjectDir)..;$(ProjectDir)..\third_party\libjpeg-turbo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\lib;$(ProjectDir)..\third_party\highway;$(ProjectDir)..\third_party\googletest\googletest\include;$(ProjectDir)..\lib\include;$(ProjectDir)..\third_party\googletest\googlemock\include;$(ProjectDir)..\third_party\brotli\c\include;$(ProjectDir)..\third_party\lcms\include;$(ProjectDir)..;$(ProjectDir)..\third_party\libjpeg-turbo;$(ProjectDir)..\third_party\libjpeg-turbo\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4146</DisableSpecificWarnings>
       <ObjectFileName>$(IntDir)subdirectory\%(RelativeDir)</ObjectFileName>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -222,7 +239,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>JPEGXL_MAJOR_VERSION=0;JPEGXL_MINOR_VERSION=10;JPEGXL_PATCH_VERSION=2;_CRT_SECURE_NO_WARNINGS;BROTLI_SHARED_COMPILATION;_WIN32;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\lib;$(ProjectDir)..\third_party\highway;$(ProjectDir)..\third_party\googletest\googletest\include;$(ProjectDir)..\lib\include;$(ProjectDir)..\third_party\googletest\googlemock\include;$(ProjectDir)..\third_party\brotli\c\include;$(ProjectDir)..\third_party\lcms\include;$(ProjectDir)..;$(ProjectDir)..\third_party\libjpeg-turbo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\lib;$(ProjectDir)..\third_party\highway;$(ProjectDir)..\third_party\googletest\googletest\include;$(ProjectDir)..\lib\include;$(ProjectDir)..\third_party\googletest\googlemock\include;$(ProjectDir)..\third_party\brotli\c\include;$(ProjectDir)..\third_party\lcms\include;$(ProjectDir)..;$(ProjectDir)..\third_party\libjpeg-turbo;$(ProjectDir)..\third_party\libjpeg-turbo\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4146</DisableSpecificWarnings>
       <ObjectFileName>$(IntDir)subdirectory\%(RelativeDir)</ObjectFileName>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -243,7 +260,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>JPEGXL_MAJOR_VERSION=0;JPEGXL_MINOR_VERSION=10;JPEGXL_PATCH_VERSION=2;_CRT_SECURE_NO_WARNINGS;BROTLI_SHARED_COMPILATION;_WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\lib;$(ProjectDir)..\third_party\highway;$(ProjectDir)..\third_party\googletest\googletest\include;$(ProjectDir)..\lib\include;$(ProjectDir)..\third_party\googletest\googlemock\include;$(ProjectDir)..\third_party\brotli\c\include;$(ProjectDir)..\third_party\lcms\include;$(ProjectDir)..;$(ProjectDir)..\third_party\libjpeg-turbo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\lib;$(ProjectDir)..\third_party\highway;$(ProjectDir)..\third_party\googletest\googletest\include;$(ProjectDir)..\lib\include;$(ProjectDir)..\third_party\googletest\googlemock\include;$(ProjectDir)..\third_party\brotli\c\include;$(ProjectDir)..\third_party\lcms\include;$(ProjectDir)..;$(ProjectDir)..\third_party\libjpeg-turbo;$(ProjectDir)..\third_party\libjpeg-turbo\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4146</DisableSpecificWarnings>
       <ObjectFileName>$(IntDir)subdirectory\%(RelativeDir)</ObjectFileName>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -263,7 +280,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>JPEGXL_MAJOR_VERSION=0;JPEGXL_MINOR_VERSION=10;JPEGXL_PATCH_VERSION=2;_CRT_SECURE_NO_WARNINGS;BROTLI_SHARED_COMPILATION;_WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\lib;$(ProjectDir)..\third_party\highway;$(ProjectDir)..\third_party\googletest\googletest\include;$(ProjectDir)..\lib\include;$(ProjectDir)..\third_party\googletest\googlemock\include;$(ProjectDir)..\third_party\brotli\c\include;$(ProjectDir)..\third_party\lcms\include;$(ProjectDir)..;$(ProjectDir)..\third_party\libjpeg-turbo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\lib;$(ProjectDir)..\third_party\highway;$(ProjectDir)..\third_party\googletest\googletest\include;$(ProjectDir)..\lib\include;$(ProjectDir)..\third_party\googletest\googlemock\include;$(ProjectDir)..\third_party\brotli\c\include;$(ProjectDir)..\third_party\lcms\include;$(ProjectDir)..;$(ProjectDir)..\third_party\libjpeg-turbo;$(ProjectDir)..\third_party\libjpeg-turbo\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4146</DisableSpecificWarnings>
       <ObjectFileName>$(IntDir)subdirectory\%(RelativeDir)</ObjectFileName>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>

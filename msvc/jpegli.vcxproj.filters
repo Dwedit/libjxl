@@ -210,6 +210,36 @@
     <ClInclude Include="..\third_party\highway\hwy\ops\x86_512-inl.h">
       <Filter>Source Files\third_party\highway\ops</Filter>
     </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\abort.h">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\auto_tune.h">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\bit_set.h">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\perf_counters.h">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\stats.h">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\x86_cpuid.h">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\ops\inside-inl.h">
+      <Filter>Source Files\third_party\highway\ops</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\ops\loongarch_lasx-inl.h">
+      <Filter>Source Files\third_party\highway\ops</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\ops\loongarch_lsx-inl.h">
+      <Filter>Source Files\third_party\highway\ops</Filter>
+    </ClInclude>
+    <ClInclude Include="..\third_party\highway\hwy\ops\x86_avx3-inl.h">
+      <Filter>Source Files\third_party\highway\ops</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\lib\jpegli\adaptive_quantization.cc">
@@ -308,5 +338,22 @@
     <ClCompile Include="..\third_party\highway\hwy\timer.cc">
       <Filter>Source Files\third_party\highway</Filter>
     </ClCompile>
+    <ClCompile Include="..\third_party\highway\hwy\abort.cc">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\highway\hwy\perf_counters.cc">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\highway\hwy\profiler.cc">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClCompile>
+    <ClCompile Include="..\third_party\highway\hwy\stats.cc">
+      <Filter>Source Files\third_party\highway</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\third_party\highway\hwy\hwy.version">
+      <Filter>Source Files\third_party\highway</Filter>
+    </None>
   </ItemGroup>
 </Project>

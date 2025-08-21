@@ -26,8 +26,11 @@
     <ClInclude Include="..\lib\jxl\cms\tone_mapping.h" />
     <ClInclude Include="..\lib\jxl\cms\transfer_functions-inl.h" />
     <ClInclude Include="..\lib\jxl\cms\transfer_functions.h" />
+    <ClInclude Include="..\third_party\highway\hwy\abort.h" />
     <ClInclude Include="..\third_party\highway\hwy\aligned_allocator.h" />
+    <ClInclude Include="..\third_party\highway\hwy\auto_tune.h" />
     <ClInclude Include="..\third_party\highway\hwy\base.h" />
+    <ClInclude Include="..\third_party\highway\hwy\bit_set.h" />
     <ClInclude Include="..\third_party\highway\hwy\cache_control.h" />
     <ClInclude Include="..\third_party\highway\hwy\detect_compiler_arch.h" />
     <ClInclude Include="..\third_party\highway\hwy\detect_targets.h" />
@@ -50,22 +53,29 @@
     <ClInclude Include="..\third_party\highway\hwy\ops\x86_128-inl.h" />
     <ClInclude Include="..\third_party\highway\hwy\ops\x86_256-inl.h" />
     <ClInclude Include="..\third_party\highway\hwy\ops\x86_512-inl.h" />
+    <ClInclude Include="..\third_party\highway\hwy\perf_counters.h" />
     <ClInclude Include="..\third_party\highway\hwy\per_target.h" />
     <ClInclude Include="..\third_party\highway\hwy\print-inl.h" />
     <ClInclude Include="..\third_party\highway\hwy\print.h" />
     <ClInclude Include="..\third_party\highway\hwy\profiler.h" />
     <ClInclude Include="..\third_party\highway\hwy\robust_statistics.h" />
+    <ClInclude Include="..\third_party\highway\hwy\stats.h" />
     <ClInclude Include="..\third_party\highway\hwy\targets.h" />
     <ClInclude Include="..\third_party\highway\hwy\timer-inl.h" />
     <ClInclude Include="..\third_party\highway\hwy\timer.h" />
+    <ClInclude Include="..\third_party\highway\hwy\x86_cpuid.h" />
     <ClInclude Include="..\third_party\lcms\src\lcms2_internal.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\lib\jxl\cms\jxl_cms.cc" />
+    <ClCompile Include="..\third_party\highway\hwy\abort.cc" />
     <ClCompile Include="..\third_party\highway\hwy\aligned_allocator.cc" />
     <ClCompile Include="..\third_party\highway\hwy\nanobenchmark.cc" />
+    <ClCompile Include="..\third_party\highway\hwy\perf_counters.cc" />
     <ClCompile Include="..\third_party\highway\hwy\per_target.cc" />
     <ClCompile Include="..\third_party\highway\hwy\print.cc" />
+    <ClCompile Include="..\third_party\highway\hwy\profiler.cc" />
+    <ClCompile Include="..\third_party\highway\hwy\stats.cc" />
     <ClCompile Include="..\third_party\highway\hwy\targets.cc" />
     <ClCompile Include="..\third_party\highway\hwy\timer.cc" />
     <ClCompile Include="..\third_party\lcms\src\cmsalpha.c" />
@@ -96,6 +106,7 @@
     <ClCompile Include="..\third_party\lcms\src\cmsxform.c" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\third_party\highway\hwy\hwy.version" />
     <None Include="..\third_party\lcms\src\lcms2.def" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
